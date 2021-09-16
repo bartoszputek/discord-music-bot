@@ -6,7 +6,6 @@ Open-source music bot designed for Discord
 * [Features](#features)
 * [TODO](#todo)
 * [Setup](#setup)
-* [Screens](#screens)
 * [License](#license)
 
 ## General info
