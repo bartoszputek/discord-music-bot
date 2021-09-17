@@ -64,4 +64,8 @@ export default class Player {
     const link = this.queue.shift();
     return `Pomyślnie usunięto - ${link}`;
   }
+
+  clearQueue() {
+    this.queue = [];
+  }
 }
