@@ -1,15 +1,14 @@
 import { Client, Intents } from 'discord.js';
-import { getVoiceConnection } from '@discordjs/voice';
 
-import Player from './player.js';
 import { CHANNEL_NAME, PREFIX, COMMANDS } from './constants.js';
+import Player from './player.js';
 import MessageManager from './messageManager.js';
 
 export default class App {
   constructor(token, language) {
     this.TOKEN = token;
-    this.player = new Player();
     this.messageManager = new MessageManager(language);
+    this.player = new Player(this.messageManager);
     this.client = new Client(
       {
         intents: [
@@ -31,15 +30,14 @@ export default class App {
 
   handleMessage(message) {
     this.messageManager.setChannel(message.channel);
-    if (!this.validateMessage(message)) {
-      return;
-    }
+    if (!this.validateMessage(message)) return;
 
     const args = message.content.substring(1).split(' ');
 
     if (COMMANDS.play.includes(args[0])) this.handlePlay(message, args);
-    if (COMMANDS.skip.includes(args[0])) this.handleSkip(message);
+    if (COMMANDS.skip.includes(args[0])) this.handleSkip();
     if (COMMANDS.disconnect.includes(args[0])) this.handleDisconnect(message);
+    if (COMMANDS.queue.includes(args[0])) this.handlePrintQueue();
   }
 
   validateMessage(message) {
@@ -52,29 +50,30 @@ export default class App {
     if (!hasPrefix) return false;
 
     if (!message.member.voice.channelId) {
-      this.messageManager.joinToVoicechat();
-      // message.channel.send('Dołącz na kanał głosowy!');
+      this.messageManager.message('joinToVoicechat');
       return false;
     }
 
     return true;
   }
 
-  handlePlay(message, args) {
-    message.channel.send(this.player.addToQueue(args[1]));
+  async handlePlay(message, args) {
+    await this.player.addToQueue(args[1]);
 
     if (this.player.queue.length === 1) {
       this.player.join(this.client.channels.cache.get(message.member.voice.channelId));
     }
   }
 
-  handleSkip(message) {
-    message.channel.send(this.player.dequeue());
+  handleSkip() {
+    this.player.dequeue();
   }
 
   handleDisconnect(message) {
-    const connection = getVoiceConnection(message.member.voice.guild.id);
-    connection.destroy();
-    this.player.clearQueue();
+    this.player.disconnect(message);
+  }
+
+  handlePrintQueue() {
+    this.player.printQueue();
   }
 }

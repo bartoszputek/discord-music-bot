@@ -11,14 +11,18 @@ export default class MessageManager {
     this.channel = channel;
   }
 
-  message() {
-    const message = stringTemplateParser('es');
+  message(messageType, valueObj) {
+    let message = this.messages[messageType];
+    if (!message) {
+      throw new Error('Unknown message!');
+    }
+    message = MessageManager.stringTemplateParser(message, valueObj);
     this.channel.send(message);
   }
-}
 
-function stringTemplateParser(expression, valueObj = {}) {
-  const templateMatcher = /{{\s?([^{}\s]*)\s?}}/g;
-  const text = expression.replace(templateMatcher, (substring, value) => valueObj[value]);
-  return text;
+  static stringTemplateParser(expression, valueObj = {}) {
+    const templateMatcher = /{{\s?([^{}\s]*)\s?}}/g;
+    const text = expression.replace(templateMatcher, (substring, value) => valueObj[value]);
+    return text;
+  }
 }

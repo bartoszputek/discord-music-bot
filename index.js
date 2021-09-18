@@ -9,5 +9,3 @@ const language = process.env.LANGUAGE;
 const app = new App(token, language);
 
 app.start();
-
-// console.log(stringTemplateParser('my name is {{name}} and age is {{age}}', { name: 'Tom', age: 100 }));

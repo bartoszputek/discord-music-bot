@@ -1,5 +1,4 @@
 import validUrl from 'valid-url';
-import ytdl from 'ytdl-core';
 import {
   joinVoiceChannel,
   getVoiceConnection,
@@ -8,9 +7,11 @@ import {
   createAudioResource,
   createAudioPlayer,
 } from '@discordjs/voice';
+import { getStream, getData } from './utils.js';
 
 export default class Player {
-  constructor() {
+  constructor(messageManager) {
+    this.messageManager = messageManager;
     this.queue = [];
     this.player = createAudioPlayer();
   }
@@ -39,33 +40,53 @@ export default class Player {
   }
 
   playSong() {
-    const link = this.queue.shift();
+    const { link } = this.queue.shift();
     if (!link) {
       return;
     }
-    const stream = ytdl(link, { filter: 'audioonly' });
+    const stream = getStream(link);
     const resource = createAudioResource(stream);
     this.player.play(resource);
   }
 
-  addToQueue(link) {
+  async addToQueue(link) {
     if (!validUrl.isUri(link)) {
-      return 'Link nie jest poprawny!';
+      this.messageManager.message('incorrectLink');
+      return;
     }
-    this.queue.push(link);
-    return `Dodano do kolejki - ${link}`;
+
+    const data = await getData(link);
+    if (!data) {
+      this.messageManager.message('unavailableLink');
+      return;
+    }
+
+    const song = { ...data, link };
+
+    this.queue.push(song);
+    this.messageManager.message('songAddedToQueue', { title: data.title });
   }
 
   dequeue() {
     if (!this.queue.length) {
-      return 'Kolejka jest pusta!';
+      this.messageManager.message('queueIsEmpty');
     }
 
-    const link = this.queue.shift();
-    return `Pomyślnie usunięto - ${link}`;
+    const { title } = this.queue.shift();
+    this.messageManager.message('songRemovedFromQueue', { title });
   }
 
-  clearQueue() {
+  disconnect(message) {
+    const connection = getVoiceConnection(message.member.voice.guild.id);
+    connection.destroy();
     this.queue = [];
+  }
+
+  printQueue() {
+    if (!this.queue.length) {
+      this.messageManager.message('queueIsEmpty');
+    }
+    const titles = this.queue.reduce((acc, song, index) => `${acc}\n**${index + 1}.**\`${song.title}\` \`${song.length}\``, '');
+    this.messageManager.message('printQueue', { titles });
   }
 }
