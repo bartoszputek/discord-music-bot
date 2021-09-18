@@ -3,11 +3,13 @@ import { getVoiceConnection } from '@discordjs/voice';
 
 import Player from './player.js';
 import { CHANNEL_NAME, PREFIX, COMMANDS } from './constants.js';
+import MessageManager from './messageManager.js';
 
 export default class App {
-  constructor(token) {
+  constructor(token, language) {
     this.TOKEN = token;
     this.player = new Player();
+    this.messageManager = new MessageManager(language);
     this.client = new Client(
       {
         intents: [
@@ -28,6 +30,7 @@ export default class App {
   }
 
   handleMessage(message) {
+    this.messageManager.setChannel(message.channel);
     if (!this.validateMessage(message)) {
       return;
     }
@@ -42,18 +45,15 @@ export default class App {
   validateMessage(message) {
     const channelName = this.client.channels.cache.get(message.channelId).name;
 
-    if (channelName !== CHANNEL_NAME) {
-      return false;
-    }
+    if (channelName !== CHANNEL_NAME) return false;
 
     const hasPrefix = message.content[0] === PREFIX;
 
-    if (!hasPrefix) {
-      return false;
-    }
+    if (!hasPrefix) return false;
 
     if (!message.member.voice.channelId) {
-      message.channel.send('Dołącz na kanał głosowy!');
+      this.messageManager.joinToVoicechat();
+      // message.channel.send('Dołącz na kanał głosowy!');
       return false;
     }
 
