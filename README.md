@@ -20,10 +20,8 @@ Project is created with:
 * Simple play/skip/disconnect interface with implementent songs queue
 
 ## TODO
-- [ ] Create current queue command
-- [ ] Add more friendly/complex feedback - emoji/song titles
+- [ ] Create support for multiserver
 - [ ] Implement searching songs by keywords
-- [ ] Implement changing language strings
 - [ ] Create tutorial to fast deploy
 
 ## Setup
