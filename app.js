@@ -38,6 +38,7 @@ export default class App {
     if (COMMANDS.skip.includes(args[0])) this.handleSkip();
     if (COMMANDS.disconnect.includes(args[0])) this.handleDisconnect(message);
     if (COMMANDS.queue.includes(args[0])) this.handlePrintQueue();
+    if (COMMANDS.help.includes(args[0])) this.handleHelp();
   }
 
   validateMessage(message) {
@@ -58,7 +59,7 @@ export default class App {
   }
 
   async handlePlay(message, args) {
-    await this.player.addToQueue(args[1]);
+    await this.player.play(args.slice(1));
 
     if (this.player.queue.length === 1) {
       this.player.join(this.client.channels.cache.get(message.member.voice.channelId));
@@ -66,7 +67,7 @@ export default class App {
   }
 
   handleSkip() {
-    this.player.dequeue();
+    this.player.skip();
   }
 
   handleDisconnect(message) {
@@ -75,5 +76,9 @@ export default class App {
 
   handlePrintQueue() {
     this.player.printQueue();
+  }
+
+  handleHelp() {
+    this.messageManager.message('help');
   }
 }

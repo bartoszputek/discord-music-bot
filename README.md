@@ -21,7 +21,6 @@ Project is created with:
 
 ## TODO
 - [ ] Create support for multiserver
-- [ ] Implement searching songs by keywords
 - [ ] Create tutorial to fast deploy
 
 ## Setup

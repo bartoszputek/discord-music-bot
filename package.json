@@ -18,7 +18,8 @@
     "ffmpeg-static": "^4.4.0",
     "libsodium-wrappers": "^0.7.9",
     "valid-url": "^1.0.9",
-    "ytdl-core": "^4.9.1"
+    "ytdl-core": "^4.9.1",
+    "ytsr": "^3.5.3"
   },
   "devDependencies": {
     "eslint": "^7.32.0",

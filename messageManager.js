@@ -1,4 +1,5 @@
 import { LANGUAGES } from './constants.js';
+import { stringTemplateParser } from './utils.js';
 
 export default class MessageManager {
   constructor(language) {
@@ -16,13 +17,7 @@ export default class MessageManager {
     if (!message) {
       throw new Error('Unknown message!');
     }
-    message = MessageManager.stringTemplateParser(message, valueObj);
+    message = stringTemplateParser(message, valueObj);
     this.channel.send(message);
-  }
-
-  static stringTemplateParser(expression, valueObj = {}) {
-    const templateMatcher = /{{\s?([^{}\s]*)\s?}}/g;
-    const text = expression.replace(templateMatcher, (substring, value) => valueObj[value]);
-    return text;
   }
 }
