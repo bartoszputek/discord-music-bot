@@ -1,12 +1,15 @@
 import { Client, Intents } from 'discord.js';
 
-import { CHANNEL_NAME, PREFIX, COMMANDS } from './constants.js';
+import { COMMANDS } from './constants.js';
 import Player from './player.js';
 import MessageManager from './messageManager.js';
 
 export default class App {
-  constructor(token, language) {
+  constructor(token, language, prefix, channelName, logger) {
     this.TOKEN = token;
+    this.PREFIX = prefix;
+    this.CHANNEL_NAME = channelName;
+    this.logger = logger;
     this.messageManager = new MessageManager(language);
     this.player = new Player(this.messageManager);
     this.client = new Client(
@@ -19,7 +22,7 @@ export default class App {
       },
     );
 
-    this.client.once('ready', () => console.log('Ready!'));
+    this.client.once('ready', () => logger.info('Ready!'));
 
     this.client.on('messageCreate', (message) => this.handleMessage(message));
   }
@@ -44,9 +47,9 @@ export default class App {
   validateMessage(message) {
     const channelName = this.client.channels.cache.get(message.channelId).name;
 
-    if (channelName !== CHANNEL_NAME) return false;
+    if (channelName !== this.CHANNEL_NAME) return false;
 
-    const hasPrefix = message.content[0] === PREFIX;
+    const hasPrefix = message.content[0] === this.PREFIX;
 
     if (!hasPrefix) return false;
 

@@ -4,7 +4,7 @@ import { stringTemplateParser } from './utils.js';
 export default class MessageManager {
   constructor(language) {
     const messages = LANGUAGES[language];
-    if (!messages) throw new Error('Choosen language is incorrect!');
+    if (!messages) throw new Error('Choosen language is incorrect! - Pick language from constants.js file');
     this.messages = messages;
   }
 

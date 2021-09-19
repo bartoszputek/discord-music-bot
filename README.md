@@ -9,7 +9,7 @@ Open-source music bot designed for Discord
 * [License](#license)
 
 ## General info
-This project has been written to develop substitute for Groovy and Rythm bots which were closed due to YouTube ToS. The idea is that you can easily create and deploy music bot for your server. At this moment project is a playground. 
+This project has been written to develop substitute for Groovy and Rythm bots which were closed due to YouTube ToS. The idea is that you can easily create and deploy music bot for your server.
 	
 ## Technologies
 Project is created with:
@@ -18,6 +18,8 @@ Project is created with:
 	
 ## Features
 * Simple play/skip/disconnect interface with implementent songs queue
+* Searching video by keywords
+* Multilanguage support, eng/pl builded in
 
 ## TODO
 - [ ] Create support for multiserver

@@ -86,8 +86,9 @@ export default class Player {
   }
 
   skip() {
-    this.player.stop();
-    this.messageManager.message('songSkipped');
+    if (this.player.stop()) {
+      this.messageManager.message('songSkipped');
+    }
   }
 
   disconnect(message) {
@@ -103,6 +104,7 @@ export default class Player {
   printQueue() {
     if (!this.queue.length) {
       this.messageManager.message('queueIsEmpty');
+      return;
     }
     const titles = getTitles(this.queue);
     this.messageManager.message('printQueue', { titles });
