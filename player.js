@@ -12,11 +12,13 @@ import {
   getData,
   getLink,
   getTitles,
+  getVideosFromPlaylist,
 } from './utils.js';
 
 export default class Player {
-  constructor(messageManager) {
+  constructor(messageManager, logger) {
     this.messageManager = messageManager;
+    this.logger = logger;
     this.queue = [];
     this.player = createAudioPlayer();
   }
@@ -45,14 +47,11 @@ export default class Player {
   }
 
   playSong() {
-    if (!this.queue.length) {
-      return;
-    }
+    if (!this.queue.length) return;
 
     const { link } = this.queue.shift();
-    if (!link) {
-      return;
-    }
+    if (!link) return;
+
     const stream = getStream(link);
     const resource = createAudioResource(stream);
     this.player.play(resource);
@@ -60,6 +59,11 @@ export default class Player {
 
   async play(args) {
     if (validUrl.isUri(args[0])) {
+      if (args[0].includes('list')) {
+        this.addPlaylistToQueue(args[0]);
+        return;
+      }
+
       await this.addToQueue(args[0]);
       return;
     }
@@ -75,6 +79,7 @@ export default class Player {
   async addToQueue(link) {
     const data = await getData(link);
     if (!data) {
+      this.logger.warn(`Cannot get data from ${link}`);
       this.messageManager.message('unavailableLink');
       return;
     }
@@ -83,6 +88,16 @@ export default class Player {
 
     this.queue.push(song);
     this.messageManager.message('songAddedToQueue', { title: data.title });
+  }
+
+  async addPlaylistToQueue(playlist) {
+    const songs = await getVideosFromPlaylist(playlist);
+    if (!songs) {
+      this.logger.warn(`Cannot get playlist from ${playlist}`);
+      return;
+    }
+    this.queue.push(...songs);
+    this.messageManager.message('playlistAddedToQueue', { title: songs[0].title });
   }
 
   skip() {

@@ -19,6 +19,7 @@ Project is created with:
 ## Features
 * Simple play/skip/disconnect interface with implementent songs queue
 * Searching video by keywords
+* Playing youtube playlist
 * Multilanguage support, eng/pl builded in
 
 ## TODO

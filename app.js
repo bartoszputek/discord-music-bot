@@ -11,7 +11,7 @@ export default class App {
     this.CHANNEL_NAME = channelName;
     this.logger = logger;
     this.messageManager = new MessageManager(language);
-    this.player = new Player(this.messageManager);
+    this.player = new Player(this.messageManager, this.logger);
     this.client = new Client(
       {
         intents: [
