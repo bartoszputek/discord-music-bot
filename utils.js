@@ -1,6 +1,7 @@
 import ytdl from 'ytdl-core';
 import ytsr from 'ytsr';
 import ytpl from 'ytpl';
+import fs from 'fs/promises';
 
 function formatLength(length) {
   return `${Math.floor(length / 60)}:${length % 60}`;
@@ -65,4 +66,18 @@ export function stringTemplateParser(expression, valueObj = {}) {
 
 export function getTitles(queue) {
   return queue.reduce((acc, song, index) => `${acc}\n**${index + 1}.**\`${song.title}\` \`${song.length}\``, '');
+}
+
+export function getFilename(args, bindsDirectory) {
+  const filename = args.join('-');
+  const fullPath = `${bindsDirectory}/${filename}.mp3`;
+  return { filename, fullPath };
+}
+
+export async function getBinds(bindsDirectory) {
+  const files = await fs.readdir(bindsDirectory);
+
+  const binds = files.reduce((acc, file, index) => `${acc}\n**${index + 1}.**\`${file.split('.')[0]}\``, '');
+
+  return binds;
 }

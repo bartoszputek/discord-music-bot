@@ -5,13 +5,13 @@ import Player from './player.js';
 import MessageManager from './messageManager.js';
 
 export default class App {
-  constructor(token, language, prefix, channelName, logger) {
+  constructor(token, language, prefix, channelName, bindsDirectory, logger) {
     this.TOKEN = token;
     this.PREFIX = prefix;
     this.CHANNEL_NAME = channelName;
     this.logger = logger;
     this.messageManager = new MessageManager(language);
-    this.player = new Player(this.messageManager, this.logger);
+    this.player = new Player(this.messageManager, bindsDirectory, this.logger);
     this.client = new Client(
       {
         intents: [
@@ -41,6 +41,8 @@ export default class App {
     if (COMMANDS.skip.includes(args[0])) this.handleSkip();
     if (COMMANDS.disconnect.includes(args[0])) this.handleDisconnect(message);
     if (COMMANDS.queue.includes(args[0])) this.handlePrintQueue();
+    if (COMMANDS.bind.includes(args[0])) this.handleBind(message, args);
+    if (COMMANDS.bindList.includes(args[0])) this.handlePrintBinds();
     if (COMMANDS.help.includes(args[0])) this.handleHelp();
   }
 
@@ -79,6 +81,18 @@ export default class App {
 
   handlePrintQueue() {
     this.player.printQueue();
+  }
+
+  handleBind(message, args) {
+    this.player.bind(args.slice(1));
+
+    if (this.player.queue.length === 1) {
+      this.player.join(this.client.channels.cache.get(message.member.voice.channelId));
+    }
+  }
+
+  handlePrintBinds() {
+    this.player.printBinds();
   }
 
   handleHelp() {

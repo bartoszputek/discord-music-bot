@@ -1,4 +1,5 @@
 import validUrl from 'valid-url';
+import fs from 'fs';
 import {
   joinVoiceChannel,
   getVoiceConnection,
@@ -13,11 +14,14 @@ import {
   getLink,
   getTitles,
   getVideosFromPlaylist,
+  getFilename,
+  getBinds,
 } from './utils.js';
 
 export default class Player {
-  constructor(messageManager, logger) {
+  constructor(messageManager, bindsDirectory, logger) {
     this.messageManager = messageManager;
+    this.bindsDirectory = bindsDirectory;
     this.logger = logger;
     this.queue = [];
     this.player = createAudioPlayer();
@@ -49,10 +53,18 @@ export default class Player {
   playSong() {
     if (!this.queue.length) return;
 
-    const { link } = this.queue.shift();
-    if (!link) return;
+    const song = this.queue.shift();
 
-    const stream = getStream(link);
+    const { type, link } = song;
+
+    let stream;
+    if (type === 'youtube') {
+      stream = getStream(link);
+    }
+    if (type === 'bind') {
+      stream = fs.createReadStream(link);
+    }
+
     const resource = createAudioResource(stream);
     this.player.play(resource);
   }
@@ -84,10 +96,11 @@ export default class Player {
       return;
     }
 
-    const song = { ...data, link };
+    const song = { ...data, link, type: 'youtube' };
 
     this.queue.push(song);
     this.messageManager.message('songAddedToQueue', { title: data.title });
+    this.handleIdle();
   }
 
   async addPlaylistToQueue(playlist) {
@@ -98,6 +111,7 @@ export default class Player {
     }
     this.queue.push(...songs);
     this.messageManager.message('playlistAddedToQueue', { title: songs[0].title });
+    this.handleIdle();
   }
 
   skip() {
@@ -116,6 +130,18 @@ export default class Player {
     this.messageManager.message('disconnectedFromVoicechat');
   }
 
+  bind(args) {
+    const { filename, fullPath } = getFilename(args, this.bindsDirectory);
+    if (!fs.existsSync(fullPath)) {
+      this.logger.warn(`Cannot get bind ${filename}`);
+      this.messageManager.message('bindNotFound', { filename });
+      return;
+    }
+    this.queue.push({ link: fullPath, type: 'bind' });
+    this.messageManager.message('bindAddedToQueue', { filename });
+    this.handleIdle();
+  }
+
   printQueue() {
     if (!this.queue.length) {
       this.messageManager.message('queueIsEmpty');
@@ -123,5 +149,16 @@ export default class Player {
     }
     const titles = getTitles(this.queue);
     this.messageManager.message('printQueue', { titles });
+  }
+
+  async printBinds() {
+    const binds = await getBinds(this.bindsDirectory);
+    this.messageManager.message('printBinds', { binds });
+  }
+
+  handleIdle() {
+    if (getVoiceConnection(this.guildId) && this.player.state?.status === 'idle') {
+      this.playSong();
+    }
   }
 }

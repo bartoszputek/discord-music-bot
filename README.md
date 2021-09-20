@@ -20,15 +20,19 @@ Project is created with:
 * Simple play/skip/disconnect interface with implementent songs queue
 * Searching video by keywords
 * Playing youtube playlist
+* Playing binds uploaded on a server
 * Multilanguage support, eng/pl builded in
 
 ## TODO
+- [ ] Handle programmer errors
+- [ ] Refactor code
 - [ ] Create support for multiserver
 - [ ] Create tutorial to fast deploy
 
 ## Setup
 To run application:
 - Create `.env` file simillary to `.env-example`
+- Add `.mp3` binds to selected folder, if you want to use spaces for playing use `-` sign as a separator
 - Run `$ npm install`
 - Run `$ npm run start`
 

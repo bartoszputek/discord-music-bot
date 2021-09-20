@@ -3,6 +3,8 @@ export const COMMANDS = {
   disconnect: ['d', 'dis'],
   skip: ['s', 'skip'],
   queue: ['q', 'queue'],
+  bind: ['b', 'bind'],
+  bindList: ['bl', 'binds', 'bindlist'],
   help: ['h', 'help'],
 };
 
@@ -18,11 +20,16 @@ export const LANGUAGES = {
     songSkipped: '**Pomyślnie pominięto** ⏭️',
     songSearch: '🔎 **Wyszukiwanie** 🎵 - `{{keywords}}`',
     printQueue: '🎵 **Obecnie w kolejce** 🎶 {{titles}}',
+    bindAddedToQueue: '**Dodano bind do kolejki** 🎶 `{{filename}}` 🔊',
+    bindNotFound: '**Bind nieznaleziony!** ❌ `{{filename}}`',
+    printBinds: '🎵 **Lista bindów** 🎶 {{binds}}',
     help: `📔 **Dostępne komendy**
     \`!p/!play [link/keywords]\`
     \`!d/!dis \`
     \`!s/!skip \`
     \`!q/!queue \`
+    \`!b/!bind [name]\`
+    \`!bl/!binds/!bindlist\`   
     \`!h/!help \``,
   },
   eng: {
@@ -36,11 +43,16 @@ export const LANGUAGES = {
     songSkipped: '**Successfully skipped** ⏭️',
     songSearch: '🔎 **Searching** 🎵 - `{{keywords}}`',
     printQueue: '🎵 **Currently in queue** 🎶 {{titles}}',
+    bindAddedToQueue: '**Added bind to queue** 🎶 `{{filename}}` 🔊',
+    bindNotFound: '**Bind not found! ❌**',
+    printBinds: '🎵 **Binds list** 🎶 {{binds}}',
     help: `📔 **Available commands**
     \`!p/!play [link/keywords]\`
     \`!d/!dis \`
     \`!s/!skip \`
     \`!q/!queue \`
+    \`!b/!bind [name]\`
+    \`!bl/!binds/!bindlist\`    
     \`!h/!help \``,
   },
 };
