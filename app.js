@@ -3,6 +3,7 @@ import { Client, Intents } from 'discord.js';
 import { COMMANDS } from './constants.js';
 import Player from './player.js';
 import MessageManager from './messageManager.js';
+import PlayerHandler from './playerHandler.js';
 
 export default class App {
   constructor(token, language, prefix, channelName, bindsDirectory, logger) {
@@ -11,7 +12,7 @@ export default class App {
     this.CHANNEL_NAME = channelName;
     this.logger = logger;
     this.messageManager = new MessageManager(language);
-    this.player = new Player(this.messageManager, bindsDirectory, this.logger);
+    this.player = new Player();
     this.client = new Client(
       {
         intents: [
@@ -21,10 +22,24 @@ export default class App {
         ],
       },
     );
+    this.playerHandler = new PlayerHandler(
+      this.player,
+      this.messageManager,
+      this.client,
+      this.logger,
+      bindsDirectory,
+    );
 
     this.client.once('ready', () => logger.info('Ready!'));
 
-    this.client.on('messageCreate', (message) => this.handleMessage(message));
+    this.client.on('messageCreate', async (message) => {
+      try {
+        await this.handleMessage(message);
+      } catch (error) {
+        this.logger.error(error);
+        process.exit(1);
+      }
+    });
   }
 
   start() {
@@ -37,13 +52,20 @@ export default class App {
 
     const args = message.content.substring(1).split(' ');
 
-    if (COMMANDS.play.includes(args[0])) this.handlePlay(message, args);
-    if (COMMANDS.skip.includes(args[0])) this.handleSkip();
-    if (COMMANDS.disconnect.includes(args[0])) this.handleDisconnect(message);
-    if (COMMANDS.queue.includes(args[0])) this.handlePrintQueue();
-    if (COMMANDS.bind.includes(args[0])) this.handleBind(message, args);
-    if (COMMANDS.bindList.includes(args[0])) this.handlePrintBinds();
-    if (COMMANDS.help.includes(args[0])) this.handleHelp();
+    if (COMMANDS.play.includes(args[0])) {
+      (async () => {
+        await this.playerHandler.play(args.slice(1), message).catch((error) => {
+          this.logger.error(error);
+          process.exit(1);
+        });
+      })();
+    }
+    if (COMMANDS.skip.includes(args[0])) this.playerHandler.skip();
+    if (COMMANDS.disconnect.includes(args[0])) this.playerHandler.disconnect(message);
+    if (COMMANDS.queue.includes(args[0])) this.playerHandler.printQueue();
+    if (COMMANDS.bind.includes(args[0])) this.playerHandler.bind(args.slice(1), message);
+    if (COMMANDS.bindList.includes(args[0])) this.playerHandler.printBinds();
+    if (COMMANDS.help.includes(args[0])) this.messageManager.message('help');
   }
 
   validateMessage(message) {
@@ -61,41 +83,5 @@ export default class App {
     }
 
     return true;
-  }
-
-  async handlePlay(message, args) {
-    await this.player.play(args.slice(1));
-
-    if (this.player.queue.length === 1) {
-      this.player.join(this.client.channels.cache.get(message.member.voice.channelId));
-    }
-  }
-
-  handleSkip() {
-    this.player.skip();
-  }
-
-  handleDisconnect(message) {
-    this.player.disconnect(message);
-  }
-
-  handlePrintQueue() {
-    this.player.printQueue();
-  }
-
-  handleBind(message, args) {
-    this.player.bind(args.slice(1));
-
-    if (this.player.queue.length === 1) {
-      this.player.join(this.client.channels.cache.get(message.member.voice.channelId));
-    }
-  }
-
-  handlePrintBinds() {
-    this.player.printBinds();
-  }
-
-  handleHelp() {
-    this.messageManager.message('help');
   }
 }

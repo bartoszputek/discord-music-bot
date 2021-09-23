@@ -18,6 +18,10 @@ export default class MessageManager {
       throw new Error('Unknown message!');
     }
     message = stringTemplateParser(message, valueObj);
+    while (message.length > 2000) {
+      this.channel.send(message.slice(0, 2000));
+      message = message.slice(2000, message.length);
+    }
     this.channel.send(message);
   }
 }

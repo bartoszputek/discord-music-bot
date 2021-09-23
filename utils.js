@@ -12,6 +12,7 @@ function formatVideos(videos) {
     title: video.title,
     link: video.shortUrl,
     length: video.duration,
+    type: 'youtube',
   }));
 }
 

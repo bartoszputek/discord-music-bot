@@ -1,7 +1,10 @@
 import winston from 'winston';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const {
-  combine, timestamp, prettyPrint, simple,
+  combine, timestamp, prettyPrint, simple, errors,
 } = winston.format;
 
 const timezone = () => new Date().toLocaleString('en-US', {
@@ -10,6 +13,7 @@ const timezone = () => new Date().toLocaleString('en-US', {
 
 const logger = winston.createLogger({
   format: combine(
+    errors({ stack: true }),
     timestamp({ format: timezone }),
     prettyPrint(),
   ),

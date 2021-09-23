@@ -24,8 +24,6 @@ Project is created with:
 * Multilanguage support, eng/pl builded in
 
 ## TODO
-- [ ] Handle programmer errors
-- [ ] Refactor code
 - [ ] Create support for multiserver
 - [ ] Create tutorial to fast deploy
 
