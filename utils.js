@@ -27,7 +27,7 @@ export async function getData(link) {
 }
 
 export function getStream(link) {
-  return ytdl(link, { filter: 'audioonly' });
+  return ytdl(link, { filter: 'audioonly', dlChunkSize: 1000000 });
 }
 
 export async function getLink(keywords) {
