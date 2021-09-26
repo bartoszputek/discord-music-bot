@@ -52,6 +52,12 @@ export default class App {
 
     const args = message.content.substring(1).split(' ');
 
+    if (COMMANDS.bindList.includes(args[0])) this.playerHandler.printBinds();
+    if (COMMANDS.help.includes(args[0])) this.messageManager.message('help');
+    if (COMMANDS.queue.includes(args[0])) this.playerHandler.printQueue();
+
+    if (!this.validateVoiceChannel(message)) return;
+
     if (COMMANDS.play.includes(args[0])) {
       (async () => {
         await this.playerHandler.play(args.slice(1), message).catch((error) => {
@@ -62,10 +68,7 @@ export default class App {
     }
     if (COMMANDS.skip.includes(args[0])) this.playerHandler.skip();
     if (COMMANDS.disconnect.includes(args[0])) this.playerHandler.disconnect(message);
-    if (COMMANDS.queue.includes(args[0])) this.playerHandler.printQueue();
     if (COMMANDS.bind.includes(args[0])) this.playerHandler.bind(args.slice(1), message);
-    if (COMMANDS.bindList.includes(args[0])) this.playerHandler.printBinds();
-    if (COMMANDS.help.includes(args[0])) this.messageManager.message('help');
   }
 
   validateMessage(message) {
@@ -77,6 +80,10 @@ export default class App {
 
     if (!hasPrefix) return false;
 
+    return true;
+  }
+
+  validateVoiceChannel(message) {
     if (!message.member.voice.channelId) {
       this.messageManager.message('joinToVoicechat');
       return false;
