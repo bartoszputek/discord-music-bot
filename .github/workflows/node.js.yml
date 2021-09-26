@@ -36,5 +36,8 @@ jobs:
         username: ${{ secrets.SSH_USERNAME }}
         key: ${{ secrets.SSH_KEY }}
         script: |
-          cd ~/
+          cd ~/discord-music-bot
+          git pull origin master
+          npm install --production
+          pm2 restart discord-bot
 
