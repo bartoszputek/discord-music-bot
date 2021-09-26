@@ -35,10 +35,9 @@ jobs:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USERNAME }}
         key: ${{ secrets.SSH_KEY }}
-        port: ${{ secrets.SSH_PORT }}
         script: |
-          cd ~/node-github-demo
+          cd ~/discord-music-bot
           git pull origin master
           npm install --production
-          pm2 restart node-app
+          pm2 restart discord-bot
 
