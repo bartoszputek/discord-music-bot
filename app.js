@@ -10,9 +10,10 @@ export default class App {
     this.TOKEN = token;
     this.PREFIX = prefix;
     this.CHANNEL_NAME = channelName;
+    this.language = language;
+    this.bindsDirectory = bindsDirectory;
     this.logger = logger;
-    this.messageManager = new MessageManager(language);
-    this.player = new Player();
+    this.playersHandlers = new Map();
     this.client = new Client(
       {
         intents: [
@@ -21,13 +22,6 @@ export default class App {
           Intents.FLAGS.GUILD_VOICE_STATES,
         ],
       },
-    );
-    this.playerHandler = new PlayerHandler(
-      this.player,
-      this.messageManager,
-      this.client,
-      this.logger,
-      bindsDirectory,
     );
 
     this.client.once('ready', () => logger.info('Ready!'));
@@ -47,28 +41,46 @@ export default class App {
   }
 
   handleMessage(message) {
-    this.messageManager.setChannel(message.channel);
+    if (!this.playersHandlers.has(message.guildId)) {
+      const messageManager = new MessageManager(this.language);
+
+      const player = new Player();
+      const playerHandler = new PlayerHandler(
+        player,
+        messageManager,
+        this.client,
+        this.logger,
+        this.bindsDirectory,
+      );
+      this.playersHandlers.set(message.guildId, playerHandler);
+    }
+
+    const playerHandler = this.playersHandlers.get(message.guildId);
+    const { messageManager } = playerHandler;
+
+    messageManager.setChannel(message.channel);
     if (!this.validateMessage(message)) return;
 
     const args = message.content.substring(1).split(' ');
 
-    if (COMMANDS.bindList.includes(args[0])) this.playerHandler.printBinds();
-    if (COMMANDS.help.includes(args[0])) this.messageManager.message('help');
-    if (COMMANDS.queue.includes(args[0])) this.playerHandler.printQueue();
+    if (COMMANDS.bindList.includes(args[0])) playerHandler.printBinds();
+    if (COMMANDS.help.includes(args[0])) messageManager.message('help');
+    if (COMMANDS.queue.includes(args[0])) playerHandler.printQueue();
 
-    if (!this.validateVoiceChannel(message)) return;
+    if (!App.validateVoiceChannel(message, messageManager)) return;
 
     if (COMMANDS.play.includes(args[0])) {
       (async () => {
-        await this.playerHandler.play(args.slice(1), message).catch((error) => {
+        await playerHandler.play(args.slice(1), message).catch((error) => {
           this.logger.error(error);
           process.exit(1);
         });
       })();
     }
-    if (COMMANDS.skip.includes(args[0])) this.playerHandler.skip();
-    if (COMMANDS.disconnect.includes(args[0])) this.playerHandler.disconnect(message);
-    if (COMMANDS.bind.includes(args[0])) this.playerHandler.bind(args.slice(1), message);
+
+    if (COMMANDS.skip.includes(args[0])) playerHandler.skip();
+    if (COMMANDS.disconnect.includes(args[0])) playerHandler.disconnect(message);
+    if (COMMANDS.bind.includes(args[0])) playerHandler.bind(args.slice(1), message);
   }
 
   validateMessage(message) {
@@ -83,9 +95,9 @@ export default class App {
     return true;
   }
 
-  validateVoiceChannel(message) {
+  static validateVoiceChannel(message, messageManager) {
     if (!message.member.voice.channelId) {
-      this.messageManager.message('joinToVoicechat');
+      messageManager.message('joinToVoicechat');
       return false;
     }
 
