@@ -5,6 +5,7 @@ Open-source music bot designed for Discord
 * [Technologies](#technologies)
 * [Features](#features)
 * [TODO](#todo)
+* [Preparation](#preparation)
 * [Setup](#setup)
 * [License](#license)
 
@@ -24,7 +25,17 @@ Project is created with:
 * Multilanguage support, eng/pl builded in
 
 ## TODO
-- [ ] Create tutorial to fast deploy
+- [ ] Add seek, clear queue commands
+- [ ] Handle non-buffered stream case
+
+## Preparation
+
+- Create application on [Discord Developer portal](https://discord.com/developers/applications)
+- Go to Bot section and create bot. Token is `DISCORD_TOKEN` in `.env` file. 
+- Go to OAuth2 section and generate invitation link. Select `bot` and `applications.commands` from scopes list. 
+- Add bot to your server using link generated in previous step. Remember, that your bot has to have permissions for reading and writing text messages on channel defined as `CHANNEL_NAME` in `.env` file.
+
+**Read more about creating a bot application** - [[1]](https://discordjs.guide/preparations/setting-up-a-bot-application.html), [[2]](https://discordjs.guide/preparations/adding-your-bot-to-servers.html)
 
 ## Setup
 To run application:
