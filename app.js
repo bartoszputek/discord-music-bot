@@ -77,6 +77,7 @@ export default class App {
         });
       })();
     }
+
     if (COMMANDS.skip.includes(args[0])) playerHandler.skip();
     if (COMMANDS.disconnect.includes(args[0])) playerHandler.disconnect(message);
     if (COMMANDS.bind.includes(args[0])) playerHandler.bind(args.slice(1), message);
