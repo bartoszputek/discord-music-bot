@@ -30,7 +30,7 @@ export async function getData(link) {
 
 export async function getStream(link) {
   return new Promise((resolve) => {
-    const stream = ytdl(link, { filter: 'audioonly', quality: 'lowestaudio', highWaterMark: HIGH_WATER_MARK });
+    const stream = ytdl(link, { filter: 'audioonly', highWaterMark: HIGH_WATER_MARK });
 
     let startTime;
 

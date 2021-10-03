@@ -26,6 +26,7 @@ Project is created with:
 
 ## TODO
 - [ ] Add seek, clear queue, reapat commands
+- [ ] Bug with printing long playlist -> songs splitted and format is broken
 
 ## Preparation
 
