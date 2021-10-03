@@ -2,6 +2,8 @@ import ytdl from 'ytdl-core';
 import ytsr from 'ytsr';
 import ytpl from 'ytpl';
 import fs from 'fs/promises';
+import { HIGH_WATER_MARK, MIN_BANDWIDTH } from './constants.js';
+import logger from './logger.js';
 
 function formatLength(length) {
   return `${Math.floor(length / 60)}:${length % 60}`;
@@ -26,8 +28,34 @@ export async function getData(link) {
   }
 }
 
-export function getStream(link) {
-  return ytdl(link, { filter: 'audioonly', dlChunkSize: 1000000 });
+export async function getStream(link) {
+  return new Promise((resolve) => {
+    const stream = ytdl(link, { filter: 'audioonly', quality: 'lowestaudio', highWaterMark: HIGH_WATER_MARK });
+
+    let startTime;
+
+    stream.once('response', () => {
+      startTime = Date.now();
+    });
+
+    stream.on('progress', (chunkLength, downloadedBytes, totalBytes) => {
+      const percent = downloadedBytes / totalBytes;
+      const downloadTime = (Date.now() - startTime) / 1000;
+      const estimatedTime = downloadTime / percent - downloadTime;
+      const minTime = totalBytes / MIN_BANDWIDTH;
+
+      if (estimatedTime.toFixed(2) >= minTime) {
+        logger.warn('Seems like YouTube is limiting our download speed, restarting the download to mitigate the problem...');
+        stream.destroy();
+        resolve(getStream(link));
+      }
+
+      if (percent === 1) {
+        logger.info(`Time to get ${link} is ${downloadTime} ms`);
+        resolve(stream);
+      }
+    });
+  });
 }
 
 export async function getLink(keywords) {
@@ -48,11 +76,6 @@ export async function getVideosFromPlaylist(playlist) {
 
   const items = searchResults.items.filter(async (item) => {
     const data = await getData(item.shortUrl);
-    if (!data) {
-      this.logger.warn(`Cannot get data from ${item.shortUrl}`);
-      this.messageManager.message('unavailableLink');
-    }
-
     return data;
   });
 

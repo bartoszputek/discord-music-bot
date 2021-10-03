@@ -1,3 +1,6 @@
+export const MIN_BANDWIDTH = 130000;
+export const HIGH_WATER_MARK = 2 ** 25;
+
 export const COMMANDS = {
   play: ['p', 'play'],
   disconnect: ['d', 'dis'],

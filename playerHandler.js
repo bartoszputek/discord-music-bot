@@ -1,5 +1,6 @@
 import fs from 'fs';
 import validUrl from 'valid-url';
+import logger from './logger.js';
 import Player from './player.js';
 import {
   getBinds,
@@ -11,11 +12,10 @@ import {
 } from './utils.js';
 
 export default class PlayerHandler {
-  constructor(player, messageManager, client, logger, bindsDirectory) {
+  constructor(player, messageManager, client, bindsDirectory) {
     this.player = player;
     this.messageManager = messageManager;
     this.client = client;
-    this.logger = logger;
     this.bindsDirectory = bindsDirectory;
   }
 
@@ -41,7 +41,7 @@ export default class PlayerHandler {
   async playPlaylist(link) {
     const songs = await getVideosFromPlaylist(link);
     if (!songs) {
-      this.logger.warn(`Cannot get playlist from ${link}`);
+      logger.warn(`Cannot get playlist from ${link}`);
       return;
     }
     this.messageManager.message('playlistAddedToQueue', { title: songs[0].title });
@@ -53,7 +53,7 @@ export default class PlayerHandler {
   async playSong(link) {
     const data = await getData(link);
     if (!data) {
-      this.logger.warn(`Cannot get data from ${link}`);
+      logger.warn(`Cannot get data from ${link}`);
       this.messageManager.message('unavailableLink');
       return;
     }
@@ -68,7 +68,7 @@ export default class PlayerHandler {
   bind(args, message) {
     const { filename, fullPath } = getFilename(args, this.bindsDirectory);
     if (!fs.existsSync(fullPath)) {
-      this.logger.warn(`Cannot get bind ${filename}`);
+      logger.warn(`Cannot get bind ${filename}`);
       this.messageManager.message('bindNotFound', { filename });
       return;
     }

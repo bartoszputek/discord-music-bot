@@ -4,15 +4,15 @@ import { COMMANDS } from './constants.js';
 import Player from './player.js';
 import MessageManager from './messageManager.js';
 import PlayerHandler from './playerHandler.js';
+import logger from './logger.js';
 
 export default class App {
-  constructor(token, language, prefix, channelName, bindsDirectory, logger) {
+  constructor(token, language, prefix, channelName, bindsDirectory) {
     this.TOKEN = token;
     this.PREFIX = prefix;
     this.CHANNEL_NAME = channelName;
     this.language = language;
     this.bindsDirectory = bindsDirectory;
-    this.logger = logger;
     this.playersHandlers = new Map();
     this.client = new Client(
       {
@@ -30,7 +30,7 @@ export default class App {
       try {
         await this.handleMessage(message);
       } catch (error) {
-        this.logger.error(error);
+        logger.error(error);
         process.exit(1);
       }
     });
@@ -49,7 +49,6 @@ export default class App {
         player,
         messageManager,
         this.client,
-        this.logger,
         this.bindsDirectory,
       );
       this.playersHandlers.set(message.guildId, playerHandler);
@@ -72,7 +71,7 @@ export default class App {
     if (COMMANDS.play.includes(args[0])) {
       (async () => {
         await playerHandler.play(args.slice(1), message).catch((error) => {
-          this.logger.error(error);
+          logger.error(error);
           process.exit(1);
         });
       })();

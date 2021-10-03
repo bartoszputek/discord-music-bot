@@ -40,7 +40,7 @@ export default class Player {
     });
   }
 
-  playSong() {
+  async playSong() {
     if (!this.queue.length) return;
 
     const song = this.queue.shift();
@@ -49,7 +49,7 @@ export default class Player {
 
     let stream;
     if (type === 'youtube') {
-      stream = getStream(link);
+      stream = await getStream(link);
     }
     if (type === 'bind') {
       stream = fs.createReadStream(link);

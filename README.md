@@ -25,8 +25,7 @@ Project is created with:
 * Multilanguage support, eng/pl builded in
 
 ## TODO
-- [ ] Add seek, clear queue commands
-- [ ] Handle non-buffered stream case
+- [ ] Add seek, clear queue, reapat commands
 
 ## Preparation
 
