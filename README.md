@@ -26,7 +26,9 @@ Project is created with:
 
 ## TODO
 - [ ] Add seek, clear queue, reapat commands
-- [ ] Bug with printing long playlist -> songs splitted and format is broken
+- [ ] Bug with playing stream that was skipped
+- [ ] Disconnect from voicechat after X seconds
+- [ ] Refactor to TypeScript
 
 ## Preparation
 

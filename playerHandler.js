@@ -102,7 +102,9 @@ export default class PlayerHandler {
       return;
     }
     const titles = getTitles(this.player.queue);
-    this.messageManager.message('printQueue', { titles });
+    titles.forEach((subset) => {
+      this.messageManager.message('printQueue', { titles: subset });
+    });
   }
 
   async printBinds() {

@@ -89,7 +89,14 @@ export function stringTemplateParser(expression, valueObj = {}) {
 }
 
 export function getTitles(queue) {
-  return queue.reduce((acc, song, index) => `${acc}\n**${index + 1}.**\`${song.title}\` \`${song.length}\``, '');
+  return queue.reduce((acc, song, index) => {
+    const subset = acc.pop();
+    const title = `\n**${index + 1}.**\`${song.title}\` \`${song.length}\``;
+    if (subset.length + title.length < 1960) {
+      return [...acc, subset + title];
+    }
+    return [...acc, subset, title];
+  }, ['']);
 }
 
 export function getFilename(args, bindsDirectory) {
