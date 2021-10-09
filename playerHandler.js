@@ -82,6 +82,8 @@ export default class PlayerHandler {
   skip() {
     if (this.player.stop()) {
       this.messageManager.message('songSkipped');
+    } else {
+      this.messageManager.message('skipUnavailable');
     }
   }
 
@@ -90,6 +92,7 @@ export default class PlayerHandler {
     if (!connection) {
       return;
     }
+    this.player.stop();
     connection.destroy();
     this.messageManager.message('disconnectedFromVoicechat');
 

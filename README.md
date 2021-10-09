@@ -4,6 +4,7 @@ Open-source music bot designed for Discord
 * [General info](#general-info)
 * [Technologies](#technologies)
 * [Features](#features)
+* [Commands List](#commands-list)
 * [TODO](#todo)
 * [Preparation](#preparation)
 * [Setup](#setup)
@@ -24,10 +25,20 @@ Project is created with:
 * Playing binds uploaded on a server
 * Multilanguage support, eng/pl builded in
 
+## Commands List
+
+| Command  | Arguments | Description |
+| ------------- | ------------- | ------------- |
+| play  | youtube link/keywords  | play song |
+| bind | bind name | play bind (local file) |
+| disconnect  | -  | disconnect from voice channel |
+| skip | - | skip current song in player |
+| queue | - | prints queue without current song |
+| bind list | - | prints avaiable binds |
+| help | - | print all commands with description |
+
 ## TODO
-- [ ] Add seek, clear queue, reapat commands
-- [ ] Bug with playing stream that was skipped
-- [ ] Disconnect from voicechat after X seconds
+- [ ] Add seek, clear queue, repeat commands
 - [ ] Refactor to TypeScript
 
 ## Preparation

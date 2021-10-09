@@ -1,10 +1,10 @@
 import { Client, Intents } from 'discord.js';
 
-import { COMMANDS } from './constants.js';
 import Player from './player.js';
 import MessageManager from './messageManager.js';
 import PlayerHandler from './playerHandler.js';
 import logger from './logger.js';
+import EventEmitter from './eventEmitter.js';
 
 export default class App {
   constructor(token, language, prefix, channelName, bindsDirectory) {
@@ -14,6 +14,7 @@ export default class App {
     this.language = language;
     this.bindsDirectory = bindsDirectory;
     this.playersHandlers = new Map();
+    this.eventEmmiter = new EventEmitter();
     this.client = new Client(
       {
         intents: [
@@ -41,6 +42,21 @@ export default class App {
   }
 
   handleMessage(message) {
+    const playerHandler = this.getPlayerHandler(message);
+    const { messageManager } = playerHandler;
+
+    messageManager.setChannel(message.channel);
+    if (!this.validateMessage(message)) return;
+
+    const args = message.content.substring(1).split(' ');
+
+    const eventName = this.eventEmmiter.findEventName(args[0]);
+    if (!eventName) return;
+
+    this.eventEmmiter.emit(eventName, playerHandler, message, args);
+  }
+
+  getPlayerHandler(message) {
     if (!this.playersHandlers.has(message.guildId)) {
       const messageManager = new MessageManager(this.language);
 
@@ -54,32 +70,7 @@ export default class App {
       this.playersHandlers.set(message.guildId, playerHandler);
     }
 
-    const playerHandler = this.playersHandlers.get(message.guildId);
-    const { messageManager } = playerHandler;
-
-    messageManager.setChannel(message.channel);
-    if (!this.validateMessage(message)) return;
-
-    const args = message.content.substring(1).split(' ');
-
-    if (COMMANDS.bindList.includes(args[0])) playerHandler.printBinds();
-    if (COMMANDS.help.includes(args[0])) messageManager.message('help');
-    if (COMMANDS.queue.includes(args[0])) playerHandler.printQueue();
-
-    if (!App.validateVoiceChannel(message, messageManager)) return;
-
-    if (COMMANDS.play.includes(args[0])) {
-      (async () => {
-        await playerHandler.play(args.slice(1), message).catch((error) => {
-          logger.error(error);
-          process.exit(1);
-        });
-      })();
-    }
-
-    if (COMMANDS.skip.includes(args[0])) playerHandler.skip();
-    if (COMMANDS.disconnect.includes(args[0])) playerHandler.disconnect(message);
-    if (COMMANDS.bind.includes(args[0])) playerHandler.bind(args.slice(1), message);
+    return this.playersHandlers.get(message.guildId);
   }
 
   validateMessage(message) {
@@ -90,15 +81,6 @@ export default class App {
     const hasPrefix = message.content[0] === this.PREFIX;
 
     if (!hasPrefix) return false;
-
-    return true;
-  }
-
-  static validateVoiceChannel(message, messageManager) {
-    if (!message.member.voice.channelId) {
-      messageManager.message('joinToVoicechat');
-      return false;
-    }
 
     return true;
   }

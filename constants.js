@@ -1,5 +1,6 @@
 export const MIN_BANDWIDTH = 130000;
-export const HIGH_WATER_MARK = 2 ** 25;
+export const HIGH_WATER_MARK = 2 ** 27;
+export const DISCONNECT_TIME = 10 * 60 * 1000;
 
 export const COMMANDS = {
   play: ['p', 'play'],
@@ -21,6 +22,7 @@ export const LANGUAGES = {
     songAddedToQueue: '**Dodano do kolejki** 🎶 `{{title}}` 🔊',
     playlistAddedToQueue: '**Dodano playlistę do kolejki** 🎶 `{{title}}` 🔊',
     songSkipped: '**Pomyślnie pominięto** ⏭️',
+    skipUnavailable: '**Nie ma nic do pominięcia! ❌**',
     songSearch: '🔎 **Wyszukiwanie** 🎵 - `{{keywords}}`',
     printQueue: '🎵 **Obecnie w kolejce** 🎶 {{titles}}',
     bindAddedToQueue: '**Dodano bind do kolejki** 🎶 `{{filename}}` 🔊',
@@ -44,6 +46,7 @@ export const LANGUAGES = {
     songAddedToQueue: '**Added to queue** 🎶 `{{title}}` 🔊',
     playlistAddedToQueue: '**Added playlist to queue** 🎶 `{{title}}` 🔊',
     songSkipped: '**Successfully skipped** ⏭️',
+    skipUnavailable: '**There is nothing to skip ❌**',
     songSearch: '🔎 **Searching** 🎵 - `{{keywords}}`',
     printQueue: '🎵 **Currently in queue** 🎶 {{titles}}',
     bindAddedToQueue: '**Added bind to queue** 🎶 `{{filename}}` 🔊',

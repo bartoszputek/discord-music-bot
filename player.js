@@ -10,6 +10,7 @@ import {
 import {
   getStream,
 } from './utils.js';
+import { DISCONNECT_TIME } from './constants.js';
 
 export default class Player {
   constructor() {
@@ -41,7 +42,21 @@ export default class Player {
   }
 
   async playSong() {
-    if (!this.queue.length) return;
+    if (!this.queue.length) {
+      this.timeout = setTimeout(() => {
+        const connection = Player.getConnection(this.guildId);
+        if (!connection) {
+          return;
+        }
+        this.player.stop();
+        connection.destroy();
+      }, DISCONNECT_TIME);
+      return;
+    }
+
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+    }
 
     const song = this.queue.shift();
 
