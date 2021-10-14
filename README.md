@@ -33,12 +33,13 @@ Project is created with:
 | bind | bind name | play bind (local file) |
 | disconnect  | -  | disconnect from voice channel |
 | skip | - | skip current song in player |
+| clear | - | skip entire queue |
 | queue | - | prints queue without current song |
 | bind list | - | prints avaiable binds |
 | help | - | print all commands with description |
 
 ## TODO
-- [ ] Add seek, clear queue, repeat commands
+- [ ] Add seek, repeat commands
 - [ ] Refactor to TypeScript
 
 ## Preparation

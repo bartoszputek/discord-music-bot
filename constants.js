@@ -1,4 +1,4 @@
-export const MIN_BANDWIDTH = 130000;
+export const MIN_BANDWIDTH = 100000;
 export const HIGH_WATER_MARK = 2 ** 27;
 export const DISCONNECT_TIME = 10 * 60 * 1000;
 
@@ -7,6 +7,7 @@ export const COMMANDS = {
   disconnect: ['d', 'dis'],
   skip: ['s', 'skip'],
   queue: ['q', 'queue'],
+  clear: ['c', 'clear'],
   bind: ['b', 'bind'],
   bindList: ['bl', 'binds', 'bindlist'],
   help: ['h', 'help'],
@@ -21,6 +22,7 @@ export const LANGUAGES = {
     queueIsEmpty: '**Kolejka jest pusta!** ⌛',
     songAddedToQueue: '**Dodano do kolejki** 🎶 `{{title}}` 🔊',
     playlistAddedToQueue: '**Dodano playlistę do kolejki** 🎶 `{{title}}` 🔊',
+    skipQueue: '**Pomyślnie cała kolejka została pominięta** ⏭️',
     songSkipped: '**Pomyślnie pominięto** ⏭️',
     skipUnavailable: '**Nie ma nic do pominięcia! ❌**',
     songSearch: '🔎 **Wyszukiwanie** 🎵 - `{{keywords}}`',
@@ -33,6 +35,7 @@ export const LANGUAGES = {
     \`!d/!dis \`
     \`!s/!skip \`
     \`!q/!queue \`
+    \`!c/!clear \`
     \`!b/!bind [name]\`
     \`!bl/!binds/!bindlist\`   
     \`!h/!help \``,
@@ -45,6 +48,7 @@ export const LANGUAGES = {
     queueIsEmpty: '**Queue is empty!** ⌛',
     songAddedToQueue: '**Added to queue** 🎶 `{{title}}` 🔊',
     playlistAddedToQueue: '**Added playlist to queue** 🎶 `{{title}}` 🔊',
+    skipQueue: '**Successfully queue has been skipped** ⏭️',
     songSkipped: '**Successfully skipped** ⏭️',
     skipUnavailable: '**There is nothing to skip ❌**',
     songSearch: '🔎 **Searching** 🎵 - `{{keywords}}`',
@@ -57,6 +61,7 @@ export const LANGUAGES = {
     \`!d/!dis \`
     \`!s/!skip \`
     \`!q/!queue \`
+    \`!c/!clear \`    
     \`!b/!bind [name]\`
     \`!bl/!binds/!bindlist\`    
     \`!h/!help \``,

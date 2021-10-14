@@ -19,6 +19,10 @@ export default class Player {
   }
 
   join(channel) {
+    if (this.getChannelId() === channel.id) {
+      return;
+    }
+    this.isPlaying = true;
     this.guildId = channel.guild.id;
     joinVoiceChannel({
       channelId: channel.id,
@@ -30,36 +34,32 @@ export default class Player {
 
   setupListeners() {
     const connection = getVoiceConnection(this.guildId);
+    connection.removeAllListeners();
+    this.player.removeAllListeners();
 
-    connection.on(VoiceConnectionStatus.Ready, () => {
+    connection.on(VoiceConnectionStatus.Ready, async () => {
       connection.subscribe(this.player);
-      this.playSong();
+      await this.playSong();
     });
 
-    this.player.on(AudioPlayerStatus.Idle, () => {
-      this.playSong();
+    this.player.on(AudioPlayerStatus.Idle, async () => {
+      this.isPlaying = false;
+      await this.playSong();
     });
   }
 
   async playSong() {
     if (!this.queue.length) {
-      this.timeout = setTimeout(() => {
-        const connection = Player.getConnection(this.guildId);
-        if (!connection) {
-          return;
-        }
-        this.player.stop();
-        connection.destroy();
-      }, DISCONNECT_TIME);
+      this.timeout = setTimeout(() => this.disconnect(), DISCONNECT_TIME);
       return;
     }
 
+    this.isPlaying = true;
     if (this.timeout) {
       clearTimeout(this.timeout);
     }
 
     const song = this.queue.shift();
-
     const { type, link } = song;
 
     let stream;
@@ -78,13 +78,25 @@ export default class Player {
     return this.player.stop();
   }
 
+  disconnect() {
+    const connection = getVoiceConnection(this.guildId);
+    if (!connection) {
+      return false;
+    }
+    const stop = this.player.stop();
+    connection.destroy();
+    this.isPlaying = false;
+
+    return stop;
+  }
+
   handleIdle() {
-    if (getVoiceConnection(this.guildId) && this.player.state?.status === 'idle') {
+    if (getVoiceConnection(this.guildId) && this.player.state?.status === 'idle' && !this.isPlaying) {
       this.playSong();
     }
   }
 
-  static getConnection(guildId) {
-    return getVoiceConnection(guildId);
+  getChannelId() {
+    return getVoiceConnection(this.guildId)?.joinConfig.channelId;
   }
 }

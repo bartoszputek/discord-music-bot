@@ -32,13 +32,19 @@ export default class EventEmitter extends defaultEventEmitter {
     this.on('disconnect', (playerHandler, message) => {
       if (!EventEmitter.validateVoiceChannel(message, playerHandler.messageManager)) return;
 
-      playerHandler.disconnect(message);
+      playerHandler.disconnect();
     });
 
     this.on('skip', (playerHandler, message) => {
       if (!EventEmitter.validateVoiceChannel(message, playerHandler.messageManager)) return;
 
       playerHandler.skip();
+    });
+
+    this.on('clear', (playerHandler, message) => {
+      if (!EventEmitter.validateVoiceChannel(message, playerHandler.messageManager)) return;
+
+      playerHandler.skipQueue();
     });
 
     this.on('queue', (playerHandler) => {

@@ -1,7 +1,6 @@
 import fs from 'fs';
 import validUrl from 'valid-url';
 import logger from './logger.js';
-import Player from './player.js';
 import {
   getBinds,
   getData,
@@ -79,6 +78,16 @@ export default class PlayerHandler {
     this.player.join(this.client.channels.cache.get(message.member.voice.channelId));
   }
 
+  skipQueue() {
+    if (!this.player.queue.length) {
+      this.messageManager.message('skipUnavailable');
+      return;
+    }
+
+    this.player.queue = [];
+    this.messageManager.message('skipQueue');
+  }
+
   skip() {
     if (this.player.stop()) {
       this.messageManager.message('songSkipped');
@@ -87,16 +96,11 @@ export default class PlayerHandler {
     }
   }
 
-  disconnect(message) {
-    const connection = Player.getConnection(message.member.voice.guild.id);
-    if (!connection) {
-      return;
-    }
-    this.player.stop();
-    connection.destroy();
-    this.messageManager.message('disconnectedFromVoicechat');
-
+  disconnect() {
+    this.player.disconnect();
     this.player.queue = [];
+
+    this.messageManager.message('disconnectedFromVoicechat');
   }
 
   printQueue() {
