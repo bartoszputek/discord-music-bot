@@ -1,4 +1,3 @@
-export const MIN_BANDWIDTH = 100000;
 export const HIGH_WATER_MARK = 2 ** 27;
 export const DISCONNECT_TIME = 10 * 60 * 1000;
 

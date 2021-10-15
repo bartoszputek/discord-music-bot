@@ -40,6 +40,7 @@ Project is created with:
 
 ## TODO
 - [ ] Add seek, repeat commands
+- [ ] Log programmer errors
 - [ ] Refactor to TypeScript
 
 ## Preparation

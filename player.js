@@ -7,9 +7,8 @@ import {
   createAudioResource,
   createAudioPlayer,
 } from '@discordjs/voice';
-import {
-  getStream,
-} from './utils.js';
+import logger from './logger.js';
+import { getStream } from './utils.js';
 import { DISCONNECT_TIME } from './constants.js';
 
 export default class Player {
@@ -39,42 +38,49 @@ export default class Player {
 
     connection.on(VoiceConnectionStatus.Ready, async () => {
       connection.subscribe(this.player);
-      await this.playSong();
+      this.playSong();
     });
 
     this.player.on(AudioPlayerStatus.Idle, async () => {
       this.isPlaying = false;
-      await this.playSong();
+      this.playSong();
     });
   }
 
-  async playSong() {
+  playSong() {
     if (!this.queue.length) {
-      this.timeout = setTimeout(() => this.disconnect(), DISCONNECT_TIME);
+      this.timeout = setTimeout(() => {
+        logger.info('Disconnect by timeout');
+        this.disconnect();
+      }, DISCONNECT_TIME);
       return;
     }
 
     this.isPlaying = true;
     if (this.timeout) {
+      logger.info('Timeout is cleared');
       clearTimeout(this.timeout);
     }
 
     const song = this.queue.shift();
     const { type, link } = song;
 
-    let stream;
     if (type === 'youtube') {
-      stream = await getStream(link);
+      (async () => {
+        this.stream = await getStream(link);
+        const resource = createAudioResource(this.stream);
+        this.player.play(resource);
+      })();
     }
     if (type === 'bind') {
-      stream = fs.createReadStream(link);
+      this.stream = fs.createReadStream(link);
+      const resource = createAudioResource(this.stream);
+      this.player.play(resource);
     }
-
-    const resource = createAudioResource(stream);
-    this.player.play(resource);
   }
 
   stop() {
+    this.stream.destroy();
     return this.player.stop();
   }
 
@@ -83,6 +89,7 @@ export default class Player {
     if (!connection) {
       return false;
     }
+    this.stream.destroy();
     const stop = this.player.stop();
     connection.destroy();
     this.isPlaying = false;

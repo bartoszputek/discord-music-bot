@@ -2,7 +2,7 @@ import ytdl from 'ytdl-core';
 import ytsr from 'ytsr';
 import ytpl from 'ytpl';
 import fs from 'fs/promises';
-import { HIGH_WATER_MARK, MIN_BANDWIDTH } from './constants.js';
+import { HIGH_WATER_MARK } from './constants.js';
 import logger from './logger.js';
 
 function formatLength(length) {
@@ -36,23 +36,15 @@ export async function getStream(link) {
 
     stream.once('response', () => {
       startTime = Date.now();
+      resolve(stream);
     });
 
     stream.on('progress', (chunkLength, downloadedBytes, totalBytes) => {
       const percent = downloadedBytes / totalBytes;
       const downloadTime = (Date.now() - startTime) / 1000;
-      const estimatedTime = downloadTime / percent - downloadTime;
-      const minTime = totalBytes / MIN_BANDWIDTH;
-
-      if (estimatedTime.toFixed(2) >= minTime) {
-        logger.warn('Seems like YouTube is limiting our download speed, restarting the download to mitigate the problem...');
-        stream.destroy();
-        resolve(getStream(link));
-      }
 
       if (percent === 1) {
-        logger.info(`Time to get ${link} is ${downloadTime} ms`);
-        resolve(stream);
+        logger.info(`Time to get ${link} is ${downloadTime} s`);
       }
     });
   });
