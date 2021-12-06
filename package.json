@@ -25,7 +25,7 @@
     "ytsr": "^3.5.3"
   },
   "devDependencies": {
-    "eslint": "^8.2.0",
+    "eslint": "^8.4.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.25.3",
     "nodemon": "^2.0.14"
