@@ -20,7 +20,7 @@
     "libsodium-wrappers": "^0.7.9",
     "valid-url": "^1.0.9",
     "winston": "^3.3.3",
-    "ytdl-core": "^4.9.1",
+    "ytdl-core": "^4.9.2",
     "ytpl": "^2.2.3",
     "ytsr": "^3.5.3"
   },
