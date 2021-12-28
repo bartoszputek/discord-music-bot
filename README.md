@@ -42,6 +42,7 @@ Project is created with:
 - [ ] Add seek, repeat commands
 - [ ] Log programmer errors
 - [ ] Refactor to TypeScript
+- [ ] Create /logs directory to be able to volume them
 
 ## Preparation
 
