@@ -5,4 +5,4 @@ services:
     env_file:
     - .env
     volumes:
-    - ./{BINDS_DIRECTORY}:/usr/src/app/{BINDS_DIRECTORY}
+    - ./${BINDS_DIRECTORY}:/usr/src/app/${BINDS_DIRECTORY}
