@@ -39,6 +39,5 @@ jobs:
           cd ~/discord-music-bot
           git fetch --all
           git reset --hard origin/master
-          npm install --production
-          pm2 restart discord-bot
+          docker-compose up -d --build
 
