@@ -22,7 +22,7 @@
     "winston": "^3.4.0",
     "ytdl-core": "^4.9.2",
     "ytpl": "^2.2.3",
-    "ytsr": "^3.5.3"
+    "ytsr": "^3.6.0"
   },
   "devDependencies": {
     "eslint": "^8.6.0",
