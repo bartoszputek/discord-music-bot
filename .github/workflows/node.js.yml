@@ -6,17 +6,13 @@ name: Node.js CI
 on:
   push:
     branches: [ master ]
-
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
         node-version: [12.x, 14.x, 16.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
     steps:
     - uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
@@ -36,8 +32,9 @@ jobs:
         username: ${{ secrets.SSH_USERNAME }}
         key: ${{ secrets.SSH_KEY }}
         script: |
-          cd ~/discord-music-bot
+          cd ${{ secrets.SSH_BUILD_PATH }}
           git fetch --all
           git reset --hard origin/master
-          docker-compose up -d --build
+          cd ../..
+          docker-compose up -d --build discord-music-bot
 
