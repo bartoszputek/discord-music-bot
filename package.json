@@ -12,7 +12,7 @@
   "author": "Bartosz Putek",
   "license": "MIT",
   "dependencies": {
-    "@discordjs/voice": "^0.8.0",
+    "@discordjs/voice": "^0.9.0",
     "@discordjs/opus": "^0.7.0",
     "discord.js": "^13.6.0",
     "dotenv": "^16.0.0",
