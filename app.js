@@ -77,7 +77,7 @@ export default class App {
   validateMessage(message) {
     const channelName = this.client.channels.cache.get(message.channelId).name;
 
-    const isSentOnCorrectChannel = channelName !== this.CHANNEL_NAME;
+    const isSentOnCorrectChannel = channelName === this.CHANNEL_NAME;
 
     const hasPrefix = message.content[0] === this.PREFIX;
 

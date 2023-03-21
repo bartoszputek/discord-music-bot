@@ -1,10 +1,7 @@
 import winston from 'winston';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 const {
-  combine, timestamp, prettyPrint, simple, errors,
+  combine, timestamp, errors, json,
 } = winston.format;
 
 const timezone = () => new Date().toLocaleString('en-US', {
@@ -15,19 +12,11 @@ const logger = winston.createLogger({
   format: combine(
     errors({ stack: true }),
     timestamp({ format: timezone }),
-    prettyPrint(),
+    json(),
   ),
-  transports: [
-    new winston.transports.File({ filename: 'logs.log' }),
-  ],
+  transports: [new winston.transports.Console()],
   handleExceptions: true,
   handleRejections: true,
 });
-
-if (process.env.NODE_ENV !== 'production') {
-  logger.add(new winston.transports.Console({
-    format: simple(),
-  }));
-}
 
 export default logger;

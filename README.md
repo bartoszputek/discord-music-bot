@@ -16,7 +16,7 @@ This project has been written to develop substitute for Groovy and Rythm bots wh
 ## Technologies
 Project is created with:
 * Node version: 16.9.1
-* Discord.js: 13.1.0
+* Discord.js: 14.8.0
 	
 ## Features
 * Simple play/skip/disconnect interface with implementent songs queue
@@ -42,7 +42,6 @@ Project is created with:
 - [ ] Add seek, repeat commands
 - [ ] Log programmer errors
 - [ ] Refactor to TypeScript
-- [ ] Create /logs directory to be able to volume them
 
 ## Preparation
 
