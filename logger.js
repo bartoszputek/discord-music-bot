@@ -20,6 +20,8 @@ const logger = winston.createLogger({
   transports: [
     new winston.transports.File({ filename: 'logs.log' }),
   ],
+  handleExceptions: true,
+  handleRejections: true,
 });
 
 if (process.env.NODE_ENV !== 'production') {

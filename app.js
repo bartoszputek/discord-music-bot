@@ -1,4 +1,4 @@
-import { Client, Intents } from 'discord.js';
+import { Client, GatewayIntentBits } from 'discord.js';
 
 import Player from './player.js';
 import MessageManager from './messageManager.js';
@@ -18,9 +18,10 @@ export default class App {
     this.client = new Client(
       {
         intents: [
-          Intents.FLAGS.GUILDS,
-          Intents.FLAGS.GUILD_MESSAGES,
-          Intents.FLAGS.GUILD_VOICE_STATES,
+          GatewayIntentBits.Guilds,
+          GatewayIntentBits.GuildMessages,
+          GatewayIntentBits.GuildVoiceStates,
+          GatewayIntentBits.MessageContent,
         ],
       },
     );
@@ -76,12 +77,10 @@ export default class App {
   validateMessage(message) {
     const channelName = this.client.channels.cache.get(message.channelId).name;
 
-    if (channelName !== this.CHANNEL_NAME) return false;
+    const isSentOnCorrectChannel = channelName !== this.CHANNEL_NAME;
 
     const hasPrefix = message.content[0] === this.PREFIX;
 
-    if (!hasPrefix) return false;
-
-    return true;
+    return isSentOnCorrectChannel && hasPrefix;
   }
 }

@@ -39,6 +39,10 @@ export async function getStream(link) {
       resolve(stream);
     });
 
+    stream.on('error', (error) => {
+      logger.error('Ytdl stream error: ', error);
+    });
+
     stream.on('progress', (chunkLength, downloadedBytes, totalBytes) => {
       const percent = downloadedBytes / totalBytes;
       const downloadTime = (Date.now() - startTime) / 1000;
