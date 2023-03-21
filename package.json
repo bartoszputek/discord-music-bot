@@ -1,12 +1,12 @@
 {
-  "name": "lucky-bot",
-  "version": "1.0.0",
+  "name": "discord-music-bot",
+  "version": "1.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js",
-    "watch": "nodemon index.js"
+    "start": "node src/index.js",
+    "watch": "nodemon src/index.js"
   },
   "author": "Bartosz Putek",
   "license": "MIT",
