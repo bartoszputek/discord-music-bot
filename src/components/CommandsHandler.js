@@ -1,6 +1,6 @@
 import fs from 'fs';
 import validUrl from 'valid-url';
-import logger from './logger.js';
+import logger from '../logger.js';
 import {
   getBinds,
   getData,
@@ -8,9 +8,9 @@ import {
   getLink,
   getTitles,
   getVideosFromPlaylist,
-} from './utils.js';
+} from '../utils.js';
 
-export default class PlayerHandler {
+export default class CommandsHandler {
   constructor(player, messageManager, client, bindsDirectory) {
     this.player = player;
     this.messageManager = messageManager;
@@ -18,9 +18,15 @@ export default class PlayerHandler {
     this.bindsDirectory = bindsDirectory;
   }
 
+  joinChannel(channel) {
+    this.messageManager.setChannel(channel);
+  }
+
   async play(args, message) {
     if (validUrl.isUri(args[0])) {
-      if (args[0].includes('list')) {
+      const isPlaylistLink = args[0].includes('list');
+
+      if (isPlaylistLink) {
         this.playPlaylist(args[0]);
       } else {
         await this.playSong(args[0]);
@@ -29,7 +35,7 @@ export default class PlayerHandler {
       const keywords = args.join(' ');
       const link = await getLink(keywords);
       if (!link) {
-        this.messageManager.message('incorrectLink');
+        this.messageManager.sendMessage('incorrectLink');
       }
       await this.playSong(link);
     }
@@ -43,7 +49,7 @@ export default class PlayerHandler {
       logger.warn(`Cannot get playlist from ${link}`);
       return;
     }
-    this.messageManager.message('playlistAddedToQueue', { title: songs[0].title });
+    this.messageManager.sendMessage('playlistAddedToQueue', { title: songs[0].title });
 
     this.player.queue.push(...songs);
     this.player.handleIdle();
@@ -53,12 +59,12 @@ export default class PlayerHandler {
     const data = await getData(link);
     if (!data) {
       logger.warn(`Cannot get data from ${link}`);
-      this.messageManager.message('unavailableLink');
+      this.messageManager.sendMessage('unavailableLink');
       return;
     }
     const song = { ...data, link, type: 'youtube' };
 
-    this.messageManager.message('songAddedToQueue', { title: data.title });
+    this.messageManager.sendMessage('songAddedToQueue', { title: data.title });
 
     this.player.queue.push(song);
     this.player.handleIdle();
@@ -68,10 +74,10 @@ export default class PlayerHandler {
     const { filename, fullPath } = getFilename(args, this.bindsDirectory);
     if (!fs.existsSync(fullPath)) {
       logger.warn(`Cannot get bind ${filename}`);
-      this.messageManager.message('bindNotFound', { filename });
+      this.messageManager.sendMessage('bindNotFound', { filename });
       return;
     }
-    this.messageManager.message('bindAddedToQueue', { filename });
+    this.messageManager.sendMessage('bindAddedToQueue', { filename });
 
     this.player.queue.push({ link: fullPath, type: 'bind' });
     this.player.handleIdle();
@@ -80,19 +86,19 @@ export default class PlayerHandler {
 
   skipQueue() {
     if (!this.player.queue.length) {
-      this.messageManager.message('skipUnavailable');
+      this.messageManager.sendMessage('skipUnavailable');
       return;
     }
 
     this.player.queue = [];
-    this.messageManager.message('skipQueue');
+    this.messageManager.sendMessage('skipQueue');
   }
 
   skip() {
     if (this.player.stop()) {
-      this.messageManager.message('songSkipped');
+      this.messageManager.sendMessage('songSkipped');
     } else {
-      this.messageManager.message('skipUnavailable');
+      this.messageManager.sendMessage('skipUnavailable');
     }
   }
 
@@ -100,22 +106,22 @@ export default class PlayerHandler {
     this.player.disconnect();
     this.player.queue = [];
 
-    this.messageManager.message('disconnectedFromVoicechat');
+    this.messageManager.sendMessage('disconnectedFromVoicechat');
   }
 
   printQueue() {
     if (!this.player.queue.length) {
-      this.messageManager.message('queueIsEmpty');
+      this.messageManager.sendMessage('queueIsEmpty');
       return;
     }
     const titles = getTitles(this.player.queue);
     titles.forEach((subset) => {
-      this.messageManager.message('printQueue', { titles: subset });
+      this.messageManager.sendMessage('printQueue', { titles: subset });
     });
   }
 
   async printBinds() {
     const binds = await getBinds(this.bindsDirectory);
-    this.messageManager.message('printBinds', { binds });
+    this.messageManager.sendMessage('printBinds', { binds });
   }
 }

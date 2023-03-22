@@ -7,9 +7,9 @@ import {
   createAudioResource,
   createAudioPlayer,
 } from '@discordjs/voice';
-import logger from './logger.js';
-import { getStream } from './utils.js';
-import { DISCONNECT_TIME } from './constants.js';
+import logger from '../logger.js';
+import { getStream } from '../utils.js';
+import { DISCONNECT_TIME } from '../constants.js';
 
 export default class Player {
   constructor() {

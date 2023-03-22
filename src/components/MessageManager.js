@@ -1,5 +1,5 @@
-import { LANGUAGES } from './constants.js';
-import { stringTemplateParser } from './utils.js';
+import { LANGUAGES } from '../constants.js';
+import { stringTemplateParser } from '../utils.js';
 
 export default class MessageManager {
   constructor(language) {
@@ -12,7 +12,7 @@ export default class MessageManager {
     this.channel = channel;
   }
 
-  message(messageType, valueObj) {
+  sendMessage(messageType, valueObj) {
     let message = this.messages[messageType];
     if (!message) {
       throw new Error('Unknown message!');

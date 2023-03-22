@@ -36,7 +36,7 @@ export const LANGUAGES = {
     \`!q/!queue \`
     \`!c/!clear \`
     \`!b/!bind [name]\`
-    \`!bl/!binds/!bindlist\`   
+    \`!bl/!binds/!bindlist\`
     \`!h/!help \``,
   },
   eng: {
@@ -60,9 +60,9 @@ export const LANGUAGES = {
     \`!d/!dis \`
     \`!s/!skip \`
     \`!q/!queue \`
-    \`!c/!clear \`    
+    \`!c/!clear \`
     \`!b/!bind [name]\`
-    \`!bl/!binds/!bindlist\`    
+    \`!bl/!binds/!bindlist\`
     \`!h/!help \``,
   },
 };

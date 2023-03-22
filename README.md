@@ -5,7 +5,6 @@ Open-source music bot designed for Discord
 * [Technologies](#technologies)
 * [Features](#features)
 * [Commands List](#commands-list)
-* [TODO](#todo)
 * [Preparation](#preparation)
 * [Setup](#setup)
 * [License](#license)
@@ -37,11 +36,6 @@ Project is created with:
 | queue | - | prints queue without current song |
 | bind list | - | prints avaiable binds |
 | help | - | print all commands with description |
-
-## TODO
-- [ ] Add seek, repeat commands
-- [ ] Log programmer errors
-- [ ] Refactor to TypeScript
 
 ## Preparation
 
