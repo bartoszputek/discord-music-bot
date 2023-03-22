@@ -56,8 +56,8 @@ Project is created with:
 To run application:
 - Create `.env` file simillary to `.env-example`
 - Add `.mp3` binds to selected folder, if you want to use spaces for playing use `-` sign as a separator
-- Run `$ npm install`
-- Run `$ npm run start`
+- Run `$ pnpm install`
+- Run `$ pnpm run start`
 
 ## License
 You can check out the full license [here](./LICENSE)

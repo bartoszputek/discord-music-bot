@@ -1,13 +1,19 @@
-FROM node:16-alpine
+FROM node:18-alpine
 
 WORKDIR /usr/src/app
 
+RUN npm install -g pnpm
+
 RUN apk add g++ make py3-pip
 
-COPY package*.json ./
+COPY package.json ./
 
-RUN npm ci --only=production
+COPY pnpm-lock.yaml ./
+
+ENV NODE_ENV=production
+
+RUN pnpm i --prod
 
 COPY . .
 
-CMD [ "npm", "run", "start"]
+CMD [ "pnpm", "start"]
