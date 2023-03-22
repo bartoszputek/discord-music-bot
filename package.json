@@ -7,7 +7,8 @@
   "scripts": {
     "start": "node src/index.js",
     "watch": "nodemon src/index.js",
-    "lint": "ads"
+    "lint": "eslint \"**/*.js\"", 
+    "lint:fix": "eslint \"**/*.js\" --fix"
   },
   "author": "Bartosz Putek",
   "license": "MIT",
