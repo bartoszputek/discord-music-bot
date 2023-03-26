@@ -15,7 +15,7 @@ RUN apk add --no-cache g++ make py3-pip
 COPY package.json ./
 COPY pnpm-lock.yaml ./
 ENV NODE_ENV=production
-COPY --from=builder /usr/src/app/dist /dist
+COPY --from=builder /usr/src/app/dist /usr/src/app/dist
 RUN pnpm i --prod
 COPY . .
 CMD [ "pnpm", "start"]
