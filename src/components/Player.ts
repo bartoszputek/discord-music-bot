@@ -11,12 +11,12 @@ import {
 } from '@discordjs/voice';
 import { VoiceChannel } from 'discord.js';
 
-import logger from '../logger.js';
-import { getStream, IQueue } from '../utils.js';
-import { DISCONNECT_TIME } from '../constants.js';
+import logger from '../logger';
+import { getStream, ISong } from '../utils';
+import { DISCONNECT_TIME } from '../constants';
 
 export default class Player {
-  public queue: IQueue[] = [];
+  public queue: ISong[] = [];
 
   private readonly _player = createAudioPlayer();
 
@@ -28,8 +28,8 @@ export default class Player {
 
   private _stream: Readable | undefined;
 
-  join(channel: VoiceChannel): void {
-    if (this.getChannelId() === channel.id) {
+  public join(channel: VoiceChannel): void {
+    if (this._getChannelId() === channel.id) {
       return;
     }
     this._isPlaying = true;
@@ -42,7 +42,7 @@ export default class Player {
     this.setupListeners(this._guildId);
   }
 
-  setupListeners(guildId: string): void {
+  public setupListeners(guildId: string): void {
     const connection = getVoiceConnection(guildId);
 
     if (connection) {
@@ -61,7 +61,7 @@ export default class Player {
     });
   }
 
-  playSong(): void {
+  public playSong(): void {
     if (!this.queue.length) {
       this._timeout = setTimeout(() => {
         logger.info('Disconnect by timeout');
@@ -93,7 +93,7 @@ export default class Player {
     }
   }
 
-  stop(): boolean {
+  public stop(): boolean {
     if (this._stream) {
       this._stream.destroy();
     }
@@ -101,7 +101,7 @@ export default class Player {
     return this._player.stop();
   }
 
-  disconnect(): boolean {
+  public disconnect(): boolean {
     if (!this._guildId) {
       return false;
     }
@@ -123,7 +123,7 @@ export default class Player {
     return stop;
   }
 
-  handleIdle(): void {
+  public handleIdle(): void {
     if (this._guildId) {
       if (getVoiceConnection(this._guildId) && this._player.state?.status === 'idle' && !this._isPlaying) {
         this.playSong();
@@ -131,7 +131,7 @@ export default class Player {
     }
   }
 
-  getChannelId(): string | null | undefined {
+  private _getChannelId(): string | null | undefined {
     return getVoiceConnection(this._guildId!)?.joinConfig.channelId;
   }
 }

@@ -1,10 +1,10 @@
 import { Client, GatewayIntentBits, Message } from 'discord.js';
 
-import Player from './Player.js';
-import MessageManager from './MessageManager.js';
-import CommandsHandler from './CommandsHandler.js';
-import logger from '../logger.js';
-import EventEmitter from './EventEmitter.js';
+import Player from './Player';
+import MessageManager from './MessageManager';
+import CommandsHandler from './CommandsHandler';
+import logger from '../logger';
+import EventEmitter from './EventEmitter';
 
 export default class App {
   private readonly _guildCommandsHandlers: Map<string, CommandsHandler>;
@@ -13,7 +13,7 @@ export default class App {
 
   private readonly _client: Client;
 
-  constructor(
+  public constructor(
     private readonly _token:string,
     private readonly _language: string,
     private readonly _prefix: string,
@@ -39,20 +39,20 @@ export default class App {
 
     this._client.on('messageCreate', async (message: Message) => {
       if (message.inGuild()) {
-        this.handleMessage(message);
+        this._handleMessage(message);
       }
     });
   }
 
-  start(): void {
+  public start(): void {
     this._client.login(this._token);
   }
 
-  handleMessage(message: Message<true>): void {
-    const commandsHandler = this.getGuildCommandHandler(message.guildId);
+  private _handleMessage(message: Message<true>): void {
+    const commandsHandler = this._getGuildCommandHandler(message.guildId);
     commandsHandler.joinChannel(message.channel);
 
-    if (!this.validateMessage(message)) return;
+    if (!this._validateMessage(message)) return;
 
     const args = message.content.substring(1).split(' ');
 
@@ -62,7 +62,7 @@ export default class App {
     this._eventEmitter.emit(eventName, commandsHandler, message, args);
   }
 
-  getGuildCommandHandler(guildId: string): CommandsHandler {
+  private _getGuildCommandHandler(guildId: string): CommandsHandler {
     if (!this._guildCommandsHandlers.has(guildId)) {
       const messageManager = new MessageManager(this._language);
 
@@ -79,7 +79,7 @@ export default class App {
     return this._guildCommandsHandlers.get(guildId)!;
   }
 
-  validateMessage(message: Message): boolean {
+  private _validateMessage(message: Message): boolean {
     const channel = this._client.channels.cache.get(message.channelId);
 
     if (!channel) {

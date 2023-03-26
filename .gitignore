@@ -2,3 +2,4 @@
 .env
 /binds
 dist
+coverage

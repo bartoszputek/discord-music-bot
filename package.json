@@ -1,12 +1,13 @@
 {
   "name": "discord-music-bot",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "",
   "main": "src/index.js",
-  "type": "module",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -p tsconfig.build.json",
     "start": "node dist/index.js",
+    "test": "ava",
+    "test:coverage": "c8 ava",
     "lint": "eslint \"src/**/*\"",
     "lint:fix": "eslint \"src/**/*\" --fix"
   },
@@ -30,13 +31,18 @@
     "ytsr": "^3.8.0"
   },
   "devDependencies": {
+    "@types/node": "^18.15.10",
     "@types/valid-url": "^1.0.4",
     "@typescript-eslint/eslint-plugin": "^5.56.0",
     "@typescript-eslint/parser": "^5.56.0",
+    "ava": "^5.2.0",
+    "c8": "^7.13.0",
     "eslint": "^8.36.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^17.0.0",
     "eslint-plugin-import": "^2.26.0",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.1.2",
     "typescript": "^5.0.2"
   }
 }

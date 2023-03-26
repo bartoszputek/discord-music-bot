@@ -1,40 +1,39 @@
-import fs from 'fs';
-
 import { Client, GuildTextBasedChannel, VoiceChannel } from 'discord.js';
 import validUrl from 'valid-url';
 
-import logger from '../logger.js';
+import logger from '../logger';
 import {
   getBinds,
-  getData,
-  getFilename,
+  getYoutubeSong,
+  getBindSong,
   getLink,
   getTitles,
   getVideosFromPlaylist,
-} from '../utils.js';
-import MessageManager from './MessageManager.js';
-import Player from './Player.js';
+  ISong,
+} from '../utils';
+import MessageManager from './MessageManager';
+import Player from './Player';
 
 export default class CommandsHandler {
-  constructor(
+  public constructor(
     private readonly _player: Player,
     public readonly messageManager: MessageManager,
     private readonly _client: Client,
     private readonly _bindsDirectory: string,
   ) {}
 
-  joinChannel(channel: GuildTextBasedChannel): void {
+  public joinChannel(channel: GuildTextBasedChannel): void {
     this.messageManager.setChannel(channel);
   }
 
-  async play(args: string[], voiceChannelId: string): Promise<void> {
+  public async play(args: string[], voiceChannelId: string): Promise<void> {
     if (validUrl.isUri(args[0])) {
       const isPlaylistLink = args[0].includes('list');
 
       if (isPlaylistLink) {
-        this.playPlaylist(args[0]);
+        this._playPlaylist(args[0]);
       } else {
-        await this.playSong(args[0]);
+        await this._playYoutubeSong(args[0]);
       }
     } else {
       const keywords = args.join(' ');
@@ -43,18 +42,22 @@ export default class CommandsHandler {
         this.messageManager.sendMessage('incorrectLink');
         return;
       }
-      await this.playSong(link);
+      await this._playYoutubeSong(link);
     }
 
     this._player.join(this._client.channels.cache.get(voiceChannelId) as VoiceChannel);
   }
 
-  async playPlaylist(link: string): Promise<void> {
-    const songs = await getVideosFromPlaylist(link);
-    if (!songs) {
-      logger.warn(`Cannot get playlist from ${link}`);
+  private async _playPlaylist(link: string): Promise<void> {
+    let songs;
+
+    try {
+      songs = await getVideosFromPlaylist(link);
+    } catch (error) {
+      logger.warn(`Cannot get playlist from ${link}`, error);
       return;
     }
+
     this.messageManager.sendMessage('playlistAddedToQueue', {
       title: songs[0].title,
     });
@@ -63,38 +66,47 @@ export default class CommandsHandler {
     this._player.handleIdle();
   }
 
-  async playSong(link: string): Promise<void> {
-    const data = await getData(link);
-    if (!data) {
-      logger.warn(`Cannot get data from ${link}`);
+  private async _playYoutubeSong(link: string): Promise<void> {
+    let song: ISong;
+
+    try {
+      song = await getYoutubeSong(link);
+    } catch (error) {
+      logger.warn(`Cannot get data from ${link}`, error);
       this.messageManager.sendMessage('unavailableLink');
       return;
     }
-    const song = { ...data, link, type: 'youtube' };
 
-    this.messageManager.sendMessage('songAddedToQueue', { title: data.title });
+    this.messageManager.sendMessage('songAddedToQueue', { title: song.title });
 
     this._player.queue.push(song);
     this._player.handleIdle();
   }
 
-  bind(args: string[], voiceChannelId: string): void {
-    const { filename, fullPath } = getFilename(args, this._bindsDirectory);
-    if (!fs.existsSync(fullPath)) {
+  public async bind(args: string[], voiceChannelId: string): Promise<void> {
+    const filename = args.join('-');
+
+    let song: ISong;
+
+    try {
+      song = await getBindSong(filename, this._bindsDirectory);
+    } catch (error) {
       logger.warn(`Cannot get bind ${filename}`);
       this.messageManager.sendMessage('bindNotFound', { filename });
       return;
     }
+
+    this._player.queue.push(song);
+
     this.messageManager.sendMessage('bindAddedToQueue', { filename });
 
-    this._player.queue.push({ link: fullPath, type: 'bind' });
     this._player.handleIdle();
     this._player.join(
       this._client.channels.cache.get(voiceChannelId) as VoiceChannel,
     );
   }
 
-  skipQueue(): void {
+  public skipQueue(): void {
     if (!this._player.queue.length) {
       this.messageManager.sendMessage('skipUnavailable');
       return;
@@ -104,7 +116,7 @@ export default class CommandsHandler {
     this.messageManager.sendMessage('skipQueue');
   }
 
-  skip(): void {
+  public skip(): void {
     if (this._player.stop()) {
       this.messageManager.sendMessage('songSkipped');
     } else {
@@ -112,25 +124,25 @@ export default class CommandsHandler {
     }
   }
 
-  disconnect(): void {
+  public disconnect(): void {
     this._player.disconnect();
     this._player.queue = [];
 
     this.messageManager.sendMessage('disconnectedFromVoicechat');
   }
 
-  printQueue(): void {
+  public printQueue(): void {
     if (!this._player.queue.length) {
       this.messageManager.sendMessage('queueIsEmpty');
       return;
     }
-    const titles = getTitles(this._player.queue as unknown as { title: string, length: string }[]);
+    const titles = getTitles(this._player.queue);
     titles.forEach((subset) => {
       this.messageManager.sendMessage('printQueue', { titles: subset });
     });
   }
 
-  async printBinds(): Promise<void> {
+  public async printBinds(): Promise<void> {
     const binds = await getBinds(this._bindsDirectory);
     this.messageManager.sendMessage('printBinds', { binds });
   }

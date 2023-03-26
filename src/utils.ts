@@ -5,39 +5,20 @@ import ytdl from 'ytdl-core';
 import ytsr from 'ytsr';
 import ytpl from 'ytpl';
 
-import { HIGH_WATER_MARK } from './constants.js';
-import logger from './logger.js';
+import { HIGH_WATER_MARK } from './constants';
+import logger from './logger';
 
-export interface IVideoData {
-  title: string;
-  length: string;
-}
-
-export interface IQueue {
-  link: string;
-  type: string;
-}
-
-export interface IFormattedVideo {
+export interface ISong {
   title: string;
   link: string;
   length: string;
-  type: string;
+  type: 'bind' | 'youtube';
 }
 
-interface IFilenameData {
-  filename: string;
-  fullPath: string;
-}
-
-export async function getData(link: string): Promise<IVideoData | undefined> {
-  try {
-    const info = await ytdl.getBasicInfo(link);
-    const { title, lengthSeconds } = info.videoDetails;
-    return { title, length: _formatLength(Number(lengthSeconds)) };
-  } catch (error) {
-    return undefined; // todo: remove undefined
-  }
+export async function getYoutubeSong(link: string): Promise<ISong> {
+  const info = await ytdl.getBasicInfo(link);
+  const { title, lengthSeconds } = info.videoDetails;
+  return { link, title, length: _formatLength(Number(lengthSeconds)), type: 'youtube' };
 }
 
 export async function getStream(link: string): Promise<Readable> {
@@ -66,22 +47,17 @@ export async function getStream(link: string): Promise<Readable> {
   });
 }
 
-export async function getLink(keywords: string): Promise<string | undefined> { // todo: remove undefined
+export async function getLink(keywords: string): Promise<string | null> {
   const searchResults = await ytsr(keywords, { limit: 1 });
   if (!searchResults.results || searchResults.items[0].type !== 'video') {
-    return undefined;
+    return null;
   }
 
   return searchResults.items[0].url;
 }
 
-export async function getVideosFromPlaylist(playlist: string): Promise<IFormattedVideo[] | undefined> {
-  let searchResults;
-  try {
-    searchResults = await ytpl(playlist);
-  } catch (error) {
-    return undefined; // todo: remove undefined
-  }
+export async function getVideosFromPlaylist(playlist: string): Promise<ISong[]> {
+  const searchResults = await ytpl(playlist);
 
   return _formatVideos(searchResults.items);
 }
@@ -92,22 +68,36 @@ export function stringTemplateParser(expression: string, valueObj: Record<string
   return text;
 }
 
-export function getTitles(queue: { title: string, length: string }[]): string[] {
-  // todo: Optimize reduce
-  return queue.reduce((acc: string[], song, index) => {
-    const subset = acc.pop()!;
+export function getTitles(queue: ISong[]): string[] {
+  const DISCORD_MAX_MESSAGE_LENGTH: number = 1960;
+
+  const messages: string[] = [];
+  let currentMessage: string = '';
+
+  queue.forEach((song, index) => {
     const title = `\n**${index + 1}.**\`${song.title}\` \`${song.length}\``;
-    if (subset.length + title.length < 1960) {
-      return [...acc, subset + title];
+
+    if (currentMessage.length + title.length < DISCORD_MAX_MESSAGE_LENGTH) {
+      currentMessage += title;
+    } else {
+      messages.push(currentMessage);
+
+      currentMessage = title;
     }
-    return [...acc, subset, title];
-  }, ['']);
+  });
+
+  messages.push(currentMessage);
+
+  return messages;
 }
 
-export function getFilename(args: string[], bindsDirectory: string): IFilenameData {
-  const filename = args.join('-');
+export async function getBindSong(filename: string, bindsDirectory: string): Promise<ISong> {
   const fullPath = `${bindsDirectory}/${filename}.mp3`;
-  return { filename, fullPath };
+
+  await fs.access(fullPath);
+
+  // todo: Get length from binds
+  return { link: fullPath, type: 'bind', title: filename, length: '0' };
 }
 
 export async function getBinds(bindsDirectory: string): Promise<string> {
@@ -122,12 +112,11 @@ function _formatLength(length: number): string {
   return `${Math.floor(length / 60)}:${length % 60}`;
 }
 
-// todo: fix ! types
-function _formatVideos(videos:ytpl.Item[]): IFormattedVideo[] {
+function _formatVideos(videos:ytpl.Item[]): ISong[] {
   return videos.map((video) => ({
     title: video.title,
     link: video.shortUrl,
-    length: video.duration!,
+    length: videos[0].duration ?? '0',
     type: 'youtube',
   }));
 }

@@ -2,21 +2,21 @@ import defaultEventEmitter from 'events';
 
 import { Message } from 'discord.js';
 
-import { COMMANDS } from '../constants.js';
-import logger from '../logger.js';
-import MessageManager from './MessageManager.js';
-import CommandsHandler from './CommandsHandler.js';
+import { COMMANDS } from '../constants';
+import logger from '../logger';
+import MessageManager from './MessageManager';
+import CommandsHandler from './CommandsHandler';
 
 export default class EventEmitter extends defaultEventEmitter {
   private _commands: Record<string, string[]>;
 
-  constructor() {
+  public constructor() {
     super();
     this._commands = COMMANDS;
     this.setupListeners();
   }
 
-  findEventName(name: string): string | undefined {
+  public findEventName(name: string): string | undefined {
     const keys = Object.keys(this._commands);
 
     const eventName = keys.find((key) => this._commands[key].includes(name));
@@ -24,9 +24,9 @@ export default class EventEmitter extends defaultEventEmitter {
     return eventName;
   }
 
-  setupListeners(): void {
+  public setupListeners(): void {
     this.on('play', async (commandsHandler: CommandsHandler, message: Message, args) => {
-      const voiceChannelId = EventEmitter.getVoiceChannelId(message, commandsHandler.messageManager);
+      const voiceChannelId = EventEmitter._getVoiceChannelId(message, commandsHandler.messageManager);
       if (!voiceChannelId) return;
 
       await commandsHandler.play(args.slice(1), voiceChannelId).catch((error: unknown) => {
@@ -36,21 +36,21 @@ export default class EventEmitter extends defaultEventEmitter {
     });
 
     this.on('disconnect', (commandsHandler: CommandsHandler, message: Message) => {
-      const voiceChannelId = EventEmitter.getVoiceChannelId(message, commandsHandler.messageManager);
+      const voiceChannelId = EventEmitter._getVoiceChannelId(message, commandsHandler.messageManager);
       if (!voiceChannelId) return;
 
       commandsHandler.disconnect();
     });
 
     this.on('skip', (commandsHandler: CommandsHandler, message: Message) => {
-      const voiceChannelId = EventEmitter.getVoiceChannelId(message, commandsHandler.messageManager);
+      const voiceChannelId = EventEmitter._getVoiceChannelId(message, commandsHandler.messageManager);
       if (!voiceChannelId) return;
 
       commandsHandler.skip();
     });
 
     this.on('clear', (commandsHandler: CommandsHandler, message: Message) => {
-      const voiceChannelId = EventEmitter.getVoiceChannelId(message, commandsHandler.messageManager);
+      const voiceChannelId = EventEmitter._getVoiceChannelId(message, commandsHandler.messageManager);
       if (!voiceChannelId) return;
 
       commandsHandler.skipQueue();
@@ -60,11 +60,11 @@ export default class EventEmitter extends defaultEventEmitter {
       commandsHandler.printQueue();
     });
 
-    this.on('bind', (commandsHandler: CommandsHandler, message: Message, args) => {
-      const voiceChannelId = EventEmitter.getVoiceChannelId(message, commandsHandler.messageManager);
+    this.on('bind', async (commandsHandler: CommandsHandler, message: Message, args) => {
+      const voiceChannelId = EventEmitter._getVoiceChannelId(message, commandsHandler.messageManager);
       if (!voiceChannelId) return;
 
-      commandsHandler.bind(args.slice(1), voiceChannelId);
+      await commandsHandler.bind(args.slice(1), voiceChannelId);
     });
 
     this.on('bindList', (commandsHandler: CommandsHandler) => {
@@ -76,7 +76,7 @@ export default class EventEmitter extends defaultEventEmitter {
     });
   }
 
-  static getVoiceChannelId(message: Message, messageManager: MessageManager): string | null {
+  private static _getVoiceChannelId(message: Message, messageManager: MessageManager): string | null {
     if (!message.member || !message.member.voice.channelId) {
       messageManager.sendMessage('joinToVoicechat');
       return null;

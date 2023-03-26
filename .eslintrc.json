@@ -45,6 +45,7 @@
         "no-constant-condition": ["error", { "checkLoops": false }],
         "@typescript-eslint/explicit-function-return-type": ["error", { "allowIIFEs": true}],
         "@typescript-eslint/no-explicit-any": "error",
+        "@typescript-eslint/explicit-member-accessibility": "error",
         "import/order": [
             "error",
             {
