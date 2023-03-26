@@ -1,14 +1,14 @@
 {
   "name": "discord-music-bot",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "start": "node src/index.js",
-    "watch": "nodemon src/index.js",
-    "lint": "eslint \"**/*.js\"", 
-    "lint:fix": "eslint \"**/*.js\" --fix"
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "lint": "eslint \"src/**/*\"",
+    "lint:fix": "eslint \"src/**/*\" --fix"
   },
   "author": "Bartosz Putek",
   "license": "MIT",
@@ -30,9 +30,13 @@
     "ytsr": "^3.8.0"
   },
   "devDependencies": {
-    "eslint": "^8.31.0",
+    "@types/valid-url": "^1.0.4",
+    "@typescript-eslint/eslint-plugin": "^5.56.0",
+    "@typescript-eslint/parser": "^5.56.0",
+    "eslint": "^8.36.0",
     "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-airbnb-typescript": "^17.0.0",
     "eslint-plugin-import": "^2.26.0",
-    "nodemon": "^2.0.20"
+    "typescript": "^5.0.2"
   }
 }

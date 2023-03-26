@@ -12,7 +12,12 @@ export const COMMANDS = {
   help: ['h', 'help'],
 };
 
-export const LANGUAGES = {
+export interface ILanguages {
+  pl: Record<string, string>
+  eng: Record<string, string>
+}
+
+export const LANGUAGES: ILanguages = {
   pl: {
     joinToVoicechat: '**Dołącz na kanał głosowy!** 🎤',
     disconnectedFromVoicechat: '**Rozłączono z kanału głosowego 📭**',

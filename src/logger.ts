@@ -4,7 +4,7 @@ const {
   combine, timestamp, errors, json,
 } = winston.format;
 
-const timezone = () => new Date().toLocaleString('en-US', {
+const timezone = (): string => new Date().toLocaleString('en-US', {
   timeZone: 'Europe/Warsaw',
 });
 

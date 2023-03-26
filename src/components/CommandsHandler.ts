@@ -1,5 +1,8 @@
 import fs from 'fs';
+
+import { Client, GuildTextBasedChannel, VoiceChannel } from 'discord.js';
 import validUrl from 'valid-url';
+
 import logger from '../logger.js';
 import {
   getBinds,
@@ -9,20 +12,22 @@ import {
   getTitles,
   getVideosFromPlaylist,
 } from '../utils.js';
+import MessageManager from './MessageManager.js';
+import Player from './Player.js';
 
 export default class CommandsHandler {
-  constructor(player, messageManager, client, bindsDirectory) {
-    this.player = player;
-    this.messageManager = messageManager;
-    this.client = client;
-    this.bindsDirectory = bindsDirectory;
-  }
+  constructor(
+    private readonly _player: Player,
+    public readonly messageManager: MessageManager,
+    private readonly _client: Client,
+    private readonly _bindsDirectory: string,
+  ) {}
 
-  joinChannel(channel) {
+  joinChannel(channel: GuildTextBasedChannel): void {
     this.messageManager.setChannel(channel);
   }
 
-  async play(args, message) {
+  async play(args: string[], voiceChannelId: string): Promise<void> {
     if (validUrl.isUri(args[0])) {
       const isPlaylistLink = args[0].includes('list');
 
@@ -36,26 +41,29 @@ export default class CommandsHandler {
       const link = await getLink(keywords);
       if (!link) {
         this.messageManager.sendMessage('incorrectLink');
+        return;
       }
       await this.playSong(link);
     }
 
-    this.player.join(this.client.channels.cache.get(message.member.voice.channelId));
+    this._player.join(this._client.channels.cache.get(voiceChannelId) as VoiceChannel);
   }
 
-  async playPlaylist(link) {
+  async playPlaylist(link: string): Promise<void> {
     const songs = await getVideosFromPlaylist(link);
     if (!songs) {
       logger.warn(`Cannot get playlist from ${link}`);
       return;
     }
-    this.messageManager.sendMessage('playlistAddedToQueue', { title: songs[0].title });
+    this.messageManager.sendMessage('playlistAddedToQueue', {
+      title: songs[0].title,
+    });
 
-    this.player.queue.push(...songs);
-    this.player.handleIdle();
+    this._player.queue.push(...songs);
+    this._player.handleIdle();
   }
 
-  async playSong(link) {
+  async playSong(link: string): Promise<void> {
     const data = await getData(link);
     if (!data) {
       logger.warn(`Cannot get data from ${link}`);
@@ -66,12 +74,12 @@ export default class CommandsHandler {
 
     this.messageManager.sendMessage('songAddedToQueue', { title: data.title });
 
-    this.player.queue.push(song);
-    this.player.handleIdle();
+    this._player.queue.push(song);
+    this._player.handleIdle();
   }
 
-  bind(args, message) {
-    const { filename, fullPath } = getFilename(args, this.bindsDirectory);
+  bind(args: string[], voiceChannelId: string): void {
+    const { filename, fullPath } = getFilename(args, this._bindsDirectory);
     if (!fs.existsSync(fullPath)) {
       logger.warn(`Cannot get bind ${filename}`);
       this.messageManager.sendMessage('bindNotFound', { filename });
@@ -79,49 +87,51 @@ export default class CommandsHandler {
     }
     this.messageManager.sendMessage('bindAddedToQueue', { filename });
 
-    this.player.queue.push({ link: fullPath, type: 'bind' });
-    this.player.handleIdle();
-    this.player.join(this.client.channels.cache.get(message.member.voice.channelId));
+    this._player.queue.push({ link: fullPath, type: 'bind' });
+    this._player.handleIdle();
+    this._player.join(
+      this._client.channels.cache.get(voiceChannelId) as VoiceChannel,
+    );
   }
 
-  skipQueue() {
-    if (!this.player.queue.length) {
+  skipQueue(): void {
+    if (!this._player.queue.length) {
       this.messageManager.sendMessage('skipUnavailable');
       return;
     }
 
-    this.player.queue = [];
+    this._player.queue = [];
     this.messageManager.sendMessage('skipQueue');
   }
 
-  skip() {
-    if (this.player.stop()) {
+  skip(): void {
+    if (this._player.stop()) {
       this.messageManager.sendMessage('songSkipped');
     } else {
       this.messageManager.sendMessage('skipUnavailable');
     }
   }
 
-  disconnect() {
-    this.player.disconnect();
-    this.player.queue = [];
+  disconnect(): void {
+    this._player.disconnect();
+    this._player.queue = [];
 
     this.messageManager.sendMessage('disconnectedFromVoicechat');
   }
 
-  printQueue() {
-    if (!this.player.queue.length) {
+  printQueue(): void {
+    if (!this._player.queue.length) {
       this.messageManager.sendMessage('queueIsEmpty');
       return;
     }
-    const titles = getTitles(this.player.queue);
+    const titles = getTitles(this._player.queue as unknown as { title: string, length: string }[]);
     titles.forEach((subset) => {
       this.messageManager.sendMessage('printQueue', { titles: subset });
     });
   }
 
-  async printBinds() {
-    const binds = await getBinds(this.bindsDirectory);
+  async printBinds(): Promise<void> {
+    const binds = await getBinds(this._bindsDirectory);
     this.messageManager.sendMessage('printBinds', { binds });
   }
 }

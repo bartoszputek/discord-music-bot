@@ -1,38 +1,50 @@
+import fs from 'fs/promises';
+import { Readable } from 'stream';
+
 import ytdl from 'ytdl-core';
 import ytsr from 'ytsr';
 import ytpl from 'ytpl';
-import fs from 'fs/promises';
+
 import { HIGH_WATER_MARK } from './constants.js';
 import logger from './logger.js';
 
-function formatLength(length) {
-  return `${Math.floor(length / 60)}:${length % 60}`;
+export interface IVideoData {
+  title: string;
+  length: string;
 }
 
-function formatVideos(videos) {
-  return videos.map((video) => ({
-    title: video.title,
-    link: video.shortUrl,
-    length: video.duration,
-    type: 'youtube',
-  }));
+export interface IQueue {
+  link: string;
+  type: string;
 }
 
-export async function getData(link) {
+export interface IFormattedVideo {
+  title: string;
+  link: string;
+  length: string;
+  type: string;
+}
+
+interface IFilenameData {
+  filename: string;
+  fullPath: string;
+}
+
+export async function getData(link: string): Promise<IVideoData | undefined> {
   try {
     const info = await ytdl.getBasicInfo(link);
     const { title, lengthSeconds } = info.videoDetails;
-    return { title, length: formatLength(lengthSeconds) };
+    return { title, length: _formatLength(Number(lengthSeconds)) };
   } catch (error) {
-    return undefined;
+    return undefined; // todo: remove undefined
   }
 }
 
-export async function getStream(link) {
+export async function getStream(link: string): Promise<Readable> {
   return new Promise((resolve) => {
     const stream = ytdl(link, { filter: 'audioonly', highWaterMark: HIGH_WATER_MARK });
 
-    let startTime;
+    let startTime: number;
 
     stream.once('response', () => {
       startTime = Date.now();
@@ -54,39 +66,36 @@ export async function getStream(link) {
   });
 }
 
-export async function getLink(keywords) {
+export async function getLink(keywords: string): Promise<string | undefined> { // todo: remove undefined
   const searchResults = await ytsr(keywords, { limit: 1 });
-  if (!searchResults.results) {
+  if (!searchResults.results || searchResults.items[0].type !== 'video') {
     return undefined;
   }
+
   return searchResults.items[0].url;
 }
 
-export async function getVideosFromPlaylist(playlist) {
+export async function getVideosFromPlaylist(playlist: string): Promise<IFormattedVideo[] | undefined> {
   let searchResults;
   try {
     searchResults = await ytpl(playlist);
   } catch (error) {
-    return undefined;
+    return undefined; // todo: remove undefined
   }
 
-  const items = searchResults.items.filter(async (item) => {
-    const data = await getData(item.shortUrl);
-    return data;
-  });
-
-  return formatVideos(items);
+  return _formatVideos(searchResults.items);
 }
 
-export function stringTemplateParser(expression, valueObj = {}) {
+export function stringTemplateParser(expression: string, valueObj: Record<string, string> = {}): string {
   const templateMatcher = /{{\s?([^{}\s]*)\s?}}/g;
   const text = expression.replace(templateMatcher, (substring, value) => valueObj[value]);
   return text;
 }
 
-export function getTitles(queue) {
-  return queue.reduce((acc, song, index) => {
-    const subset = acc.pop();
+export function getTitles(queue: { title: string, length: string }[]): string[] {
+  // todo: Optimize reduce
+  return queue.reduce((acc: string[], song, index) => {
+    const subset = acc.pop()!;
     const title = `\n**${index + 1}.**\`${song.title}\` \`${song.length}\``;
     if (subset.length + title.length < 1960) {
       return [...acc, subset + title];
@@ -95,16 +104,30 @@ export function getTitles(queue) {
   }, ['']);
 }
 
-export function getFilename(args, bindsDirectory) {
+export function getFilename(args: string[], bindsDirectory: string): IFilenameData {
   const filename = args.join('-');
   const fullPath = `${bindsDirectory}/${filename}.mp3`;
   return { filename, fullPath };
 }
 
-export async function getBinds(bindsDirectory) {
+export async function getBinds(bindsDirectory: string): Promise<string> {
   const files = await fs.readdir(bindsDirectory);
 
   const binds = files.reduce((acc, file, index) => `${acc}\n**${index + 1}.**\`${file.split('.')[0]}\``, '');
 
   return binds;
+}
+
+function _formatLength(length: number): string {
+  return `${Math.floor(length / 60)}:${length % 60}`;
+}
+
+// todo: fix ! types
+function _formatVideos(videos:ytpl.Item[]): IFormattedVideo[] {
+  return videos.map((video) => ({
+    title: video.title,
+    link: video.shortUrl,
+    length: video.duration!,
+    type: 'youtube',
+  }));
 }
