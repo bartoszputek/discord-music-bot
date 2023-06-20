@@ -96,7 +96,6 @@ export async function getBindSong(filename: string, bindsDirectory: string): Pro
 
   await fs.access(fullPath);
 
-  // todo: Get length from binds
   return { link: fullPath, type: 'bind', title: filename, length: '0' };
 }
 

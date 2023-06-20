@@ -1,6 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "exclude": [
-    "tests/**/*"
+    "tests/**/*",
+    "ava.config.cjs"
   ]
 }
