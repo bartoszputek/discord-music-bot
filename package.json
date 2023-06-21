@@ -10,7 +10,8 @@
     "test:coverage": "c8 ava",
     "lint": "eslint \"src/**/*\"",
     "lint:fix": "eslint \"src/**/*\" --fix",
-    "format": "prettier --write --ignore-unknown .",
+    "format": "prettier --check --ignore-unknown .",
+    "format:fix": "prettier --write --ignore-unknown .",
     "prepare": "husky install"
   },
   "author": "Bartosz Putek",
