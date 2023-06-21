@@ -8,7 +8,7 @@ specifiers:
   '@typescript-eslint/eslint-plugin': ^5.60.0
   '@typescript-eslint/parser': ^5.60.0
   ava: ^5.3.1
-  c8: ^7.14.0
+  c8: 8.0.0
   discord.js: ^14.11.0
   dotenv: ^16.3.1
   eslint: ^8.43.0
@@ -49,7 +49,7 @@ devDependencies:
   '@typescript-eslint/eslint-plugin': 5.60.0_6yzi2ymi2jevhjfd3hf6w262e4
   '@typescript-eslint/parser': 5.60.0_7yfldhli4vs6yywnkyiujhawka
   ava: 5.3.1
-  c8: 7.14.0
+  c8: 8.0.0
   eslint: 8.43.0
   eslint-config-airbnb-base: 15.0.0_reondqha3k2utzsghz7hyp2koq
   eslint-config-airbnb-typescript: 17.0.0_67k7fyn6f6ypkgtnvluptjxdqi
@@ -816,9 +816,9 @@ packages:
       streamsearch: 1.1.0
     dev: false
 
-  /c8/7.14.0:
-    resolution: { integrity: sha512-i04rtkkcNcCf7zsQcSv/T9EbUn4RXQ6mropeMcjFOsQXQ0iGLAr/xT6TImQg4+U9hmNpN9XdvPkjUL1IzbgxJw== }
-    engines: { node: '>=10.12.0' }
+  /c8/8.0.0:
+    resolution: { integrity: sha512-XHA5vSfCLglAc0Xt8eLBZMv19lgiBSjnb1FLAQgnwkuhJYEonpilhEB4Ea3jPAbm0FhD6VVJrc0z73jPe7JyGQ== }
+    engines: { node: '>=12' }
     hasBin: true
     dependencies:
       '@bcoe/v8-coverage': 0.2.3

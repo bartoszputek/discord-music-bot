@@ -1,6 +1,6 @@
 {
   "name": "discord-music-bot",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "",
   "main": "src/index.js",
   "scripts": {
@@ -39,7 +39,7 @@
     "@typescript-eslint/eslint-plugin": "^5.60.0",
     "@typescript-eslint/parser": "^5.60.0",
     "ava": "^5.3.1",
-    "c8": "^7.14.0",
+    "c8": "8.0.0",
     "eslint": "^8.43.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^17.0.0",
