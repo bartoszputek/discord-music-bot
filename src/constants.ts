@@ -13,8 +13,8 @@ export const COMMANDS = {
 };
 
 export interface ILanguages {
-  pl: Record<string, string>
-  eng: Record<string, string>
+  pl: Record<string, string>;
+  eng: Record<string, string>;
 }
 
 export const LANGUAGES: ILanguages = {

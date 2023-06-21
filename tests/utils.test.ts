@@ -48,9 +48,7 @@ test('getVideosFromPlaylist(): should return videos from the youtube playlist', 
 });
 
 test('getTitles(): should return a message with title and length of the song', (t) => {
-  const songs: ISong[] = [
-    _createSong({ title: 'My Title', length: '3:20' }),
-  ];
+  const songs: ISong[] = [_createSong({ title: 'My Title', length: '3:20' })];
 
   const messages: string[] = getTitles(songs);
 
@@ -60,10 +58,7 @@ test('getTitles(): should return a message with title and length of the song', (
 });
 
 test('getTitles(): should split too long songs to two messages', (t) => {
-  const songs: ISong[] = [
-    _createSong({ title: 'a'.repeat(1500) }),
-    _createSong({ title: 'a'.repeat(1500) }),
-  ];
+  const songs: ISong[] = [_createSong({ title: 'a'.repeat(1500) }), _createSong({ title: 'a'.repeat(1500) })];
 
   const messages: string[] = getTitles(songs);
 

@@ -1,19 +1,14 @@
 import winston from 'winston';
 
-const {
-  combine, timestamp, errors, json,
-} = winston.format;
+const { combine, timestamp, errors, json } = winston.format;
 
-const timezone = (): string => new Date().toLocaleString('en-US', {
-  timeZone: 'Europe/Warsaw',
-});
+const timezone = (): string =>
+  new Date().toLocaleString('en-US', {
+    timeZone: 'Europe/Warsaw',
+  });
 
 const logger = winston.createLogger({
-  format: combine(
-    errors({ stack: true }),
-    timestamp({ format: timezone }),
-    json(),
-  ),
+  format: combine(errors({ stack: true }), timestamp({ format: timezone }), json()),
   transports: [new winston.transports.Console()],
   handleExceptions: true,
   handleRejections: true,

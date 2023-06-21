@@ -1,9 +1,9 @@
-version: "3.9"
+version: '3.9'
 services:
   discord-music-bot:
     build: .
     image: discord-music-bot:latest
     env_file:
-    - .env
+      - .env
     volumes:
-    - ./${BINDS_DIRECTORY}:/usr/src/app/${BINDS_DIRECTORY}
+      - ./${BINDS_DIRECTORY}:/usr/src/app/${BINDS_DIRECTORY}

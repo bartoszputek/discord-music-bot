@@ -14,24 +14,22 @@ export default class App {
   private readonly _client: Client;
 
   public constructor(
-    private readonly _token:string,
+    private readonly _token: string,
     private readonly _language: string,
     private readonly _prefix: string,
     private readonly _channelName: string,
-    private readonly _bindsDirectory: string,
+    private readonly _bindsDirectory: string
   ) {
     this._guildCommandsHandlers = new Map();
     this._eventEmitter = new EventEmitter();
-    this._client = new Client(
-      {
-        intents: [
-          GatewayIntentBits.Guilds,
-          GatewayIntentBits.GuildMessages,
-          GatewayIntentBits.GuildVoiceStates,
-          GatewayIntentBits.MessageContent,
-        ],
-      },
-    );
+    this._client = new Client({
+      intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.GuildVoiceStates,
+        GatewayIntentBits.MessageContent,
+      ],
+    });
 
     this._client.once('ready', () => {
       logger.info('Ready!');
@@ -67,12 +65,7 @@ export default class App {
       const messageManager = new MessageManager(this._language);
 
       const player = new Player();
-      const commandsHandler = new CommandsHandler(
-        player,
-        messageManager,
-        this._client,
-        this._bindsDirectory,
-      );
+      const commandsHandler = new CommandsHandler(player, messageManager, this._client, this._bindsDirectory);
       this._guildCommandsHandlers.set(guildId, commandsHandler);
     }
 

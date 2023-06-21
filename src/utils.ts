@@ -18,12 +18,20 @@ export interface ISong {
 export async function getYoutubeSong(link: string): Promise<ISong> {
   const info = await ytdl.getBasicInfo(link);
   const { title, lengthSeconds } = info.videoDetails;
-  return { link, title, length: _formatLength(Number(lengthSeconds)), type: 'youtube' };
+  return {
+    link,
+    title,
+    length: _formatLength(Number(lengthSeconds)),
+    type: 'youtube',
+  };
 }
 
 export async function getStream(link: string): Promise<Readable> {
   return new Promise((resolve) => {
-    const stream = ytdl(link, { filter: 'audioonly', highWaterMark: HIGH_WATER_MARK });
+    const stream = ytdl(link, {
+      filter: 'audioonly',
+      highWaterMark: HIGH_WATER_MARK,
+    });
 
     let startTime: number;
 
@@ -111,7 +119,7 @@ function _formatLength(length: number): string {
   return `${Math.floor(length / 60)}:${length % 60}`;
 }
 
-function _formatVideos(videos:ytpl.Item[]): ISong[] {
+function _formatVideos(videos: ytpl.Item[]): ISong[] {
   return videos.map((video) => ({
     title: video.title,
     link: video.shortUrl,

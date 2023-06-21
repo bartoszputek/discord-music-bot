@@ -19,7 +19,7 @@ export default class MessageManager {
     this._channel = channel;
   }
 
-  public sendMessage(messageType:string, valueObj: Record<string, string> = {}): void {
+  public sendMessage(messageType: string, valueObj: Record<string, string> = {}): void {
     let message = this._messages[messageType];
     if (!message) {
       throw new Error('Unknown message!');

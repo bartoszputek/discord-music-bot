@@ -2,15 +2,7 @@ import { Client, GuildTextBasedChannel, VoiceChannel } from 'discord.js';
 import validUrl from 'valid-url';
 
 import logger from '../logger';
-import {
-  getBinds,
-  getYoutubeSong,
-  getBindSong,
-  getLink,
-  getTitles,
-  getVideosFromPlaylist,
-  ISong,
-} from '../utils';
+import { getBinds, getYoutubeSong, getBindSong, getLink, getTitles, getVideosFromPlaylist, ISong } from '../utils';
 import MessageManager from './MessageManager';
 import Player from './Player';
 
@@ -19,7 +11,7 @@ export default class CommandsHandler {
     private readonly _player: Player,
     public readonly messageManager: MessageManager,
     private readonly _client: Client,
-    private readonly _bindsDirectory: string,
+    private readonly _bindsDirectory: string
   ) {}
 
   public joinChannel(channel: GuildTextBasedChannel): void {
@@ -101,9 +93,7 @@ export default class CommandsHandler {
     this.messageManager.sendMessage('bindAddedToQueue', { filename });
 
     this._player.handleIdle();
-    this._player.join(
-      this._client.channels.cache.get(voiceChannelId) as VoiceChannel,
-    );
+    this._player.join(this._client.channels.cache.get(voiceChannelId) as VoiceChannel);
   }
 
   public skipQueue(): void {
