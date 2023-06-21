@@ -12,7 +12,7 @@
     "lint:fix": "eslint \"src/**/*\" --fix",
     "format": "prettier --check --ignore-unknown .",
     "format:fix": "prettier --write --ignore-unknown .",
-    "prepare": "husky install"
+    "prepare": "if [[ -x \"$(command -v husky)\" ]]; then husky install; fi"
   },
   "author": "Bartosz Putek",
   "license": "MIT",
